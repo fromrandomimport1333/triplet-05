@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tsyp14.local/schemas/reading.schema.json",
+  "title": "Sensor reading (Twin -> Brain, Guardian; MQTT city/<zone>/<kind>/<sensor_id>)",
+  "description": "Extra kind-specific fields are allowed (camera details, aqi, emergency-call details).",
+  "type": "object",
+  "properties": {
+    "contract_version": {
+      "type": "string",
+      "pattern": "^1\\.[0-9]+$",
+      "description": "Contract version; this repository speaks 1.x"
+    },
+    "type": {
+      "const": "reading"
+    },
+    "sensor_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[A-Za-z0-9_.:#@-]+$"
+    },
+    "zone_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[A-Za-z0-9_.:#@-]+$"
+    },
+    "kind": {
+      "enum": [
+        "traffic",
+        "traffic_camera",
+        "water_level",
+        "rain",
+        "air_quality",
+        "power_load",
+        "emergency_call"
+      ]
+    },
+    "value": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "unit": {
+      "type": "string"
+    },
+    "ts": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z$",
+      "description": "UTC ISO-8601"
+    },
+    "seq": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "sig": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "HMAC-SHA256 (hex) over the message without sig, keys sorted, separators (',', ':')"
+    },
+    "quarantined": {
+      "type": "boolean"
+    },
+    "fault": {
+      "type": "object",
+      "description": "Scoring label only. A Guardian under test must ignore it."
+    },
+    "mean_speed_kmh": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "halted_vehicles": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "density_pct": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "aqi": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    }
+  },
+  "required": [
+    "contract_version",
+    "type",
+    "sensor_id",
+    "zone_id",
+    "kind",
+    "value",
+    "unit",
+    "ts",
+    "seq",
+    "sig"
+  ],
+  "additionalProperties": true
+}

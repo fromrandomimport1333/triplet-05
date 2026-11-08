@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2026-11-06T14:41:15.794354+01:00 by Eclipse SUMO netconvert 1.28.0
+<netconvertConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/netconvertConfiguration.xsd">
+
+    <input>
+        <type-files value="${SUMO_HOME}\data\typemap\osmNetconvert.typ.xml,${SUMO_HOME}\data\typemap\osmNetconvertUrbanDe.typ.xml,${SUMO_HOME}\data\typemap\osmNetconvertPedestrians.typ.xml,${SUMO_HOME}\data\typemap\osmNetconvertShips.typ.xml,${SUMO_HOME}\data\typemap\osmNetconvertAerialway.typ.xml"/>
+        <osm-files value="osm_bbox.osm.xml.gz"/>
+    </input>
+
+    <output>
+        <output-file value="osm.net.xml.gz"/>
+        <output.street-names value="true"/>
+        <output.original-names value="true"/>
+        <ptstop-output value="osm_stops.add.xml"/>
+        <ptline-output value="osm_ptlines.xml"/>
+        <ptline-clean-up value="true"/>
+    </output>
+
+    <projection>
+        <proj.utm value="true"/>
+    </projection>
+
+    <processing>
+        <geometry.remove value="true"/>
+    </processing>
+
+    <tls_building>
+        <tls.discard-simple value="true"/>
+        <tls.join value="true"/>
+        <tls.guess-signals value="true"/>
+        <tls.default-type value="actuated"/>
+    </tls_building>
+
+    <ramp_guessing>
+        <ramps.guess value="true"/>
+    </ramp_guessing>
+
+    <junctions>
+        <junctions.join value="true"/>
+    </junctions>
+
+    <pedestrian>
+        <crossings.guess value="true"/>
+    </pedestrian>
+
+    <railway>
+        <railway.topology.repair value="true"/>
+    </railway>
+
+    <formats>
+        <osm.sidewalks value="true"/>
+    </formats>
+
+</netconvertConfiguration>
+-->
+
+<ptLines xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/ptlines_file.xsd">
+    <ptLine id="1355997" name="تونس - حلق الوادي - المرسى" line="تونس - حلق الوادي - المرسى" type="light_rail" vClass="rail_urban" completeness="0.06" missingAfter="17">
+        <route edges="756027830#0 756027830#1 903665553 1125463856#1 1125463856#2 1125463856#3 93264447"/>
+        <busStop id="1146894481" name="تونس البحرية"/>
+    </ptLine>
+    <ptLine id="1365361" name="خط 1: بن عروس - ساحة برشلونة" line="1" type="light_rail" vClass="rail_urban" completeness="0.09" missingBefore="10">
+        <route edges="94352002#0 94352002#1 687746328"/>
+        <busStop id="1094511110" name="ساحة برشلونة"/>
+    </ptLine>
+    <ptLine id="1366793" name="خط 2 - أريانة =&gt; ساحة الجمهورية" line="2" type="light_rail" vClass="rail_urban" completeness="0.17" missingBefore="10">
+        <route edges="686935564#0 686935564#1 94210236#0 94210236#1 94210236#2"/>
+        <busStop id="1094907123" name="نيلسون مانديلا"/>
+        <busStop id="1094892860" name="ساحة الجمهورية"/>
+    </ptLine>
+    <ptLine id="1368272" name="خط 3 - ابن خلدون-ساحة برشلونة" line="3" type="light_rail" vClass="rail_urban" completeness="0.50" missingBefore="6">
+        <route edges="94237727#0 94237727#1 94237727#2 94237727#3 94237727#4 94237727#5 94237727#6 94237727#7 94237727#8 94237727#9 28974100#0 28974100#1 94237743#0 94237743#1 94237743#2 94237743#4 94237743#5 94237743#6 94237743#7 94237743#8 94237743#9 94237743#10 94237743#11 94237743#12 94237743#13 94237743#14 94237743#15 94237743#16 94248377#0 94248377#1 686514116#0 686514116#1 1223502957 94165476#0 94165476#2"/>
+        <busStop id="5807318625" name="باب سعدون"/>
+        <busStop id="5807318593" name="باب العسل"/>
+        <busStop id="5807318588" name="باب الخضراء"/>
+        <busStop id="616142063" name="ساحة الجمهورية"/>
+        <busStop id="1094476493" name="ابن رشيق"/>
+        <busStop id="1094910475" name="ساحة برشلونة"/>
+    </ptLine>
+    <ptLine id="1368401" name="خط 4 - خير الدين-تونس البحرية" line="4" type="light_rail" vClass="rail_urban" completeness="0.33" missingBefore="14">
+        <route edges="94237727#0 94237727#1 94237727#2 94237727#3 94237727#4 94237727#5 94237727#6 94237727#7 94237727#8 94237727#9 28974100#0 28974100#1 94237743#0 94237743#1 94237743#2 94237743#4 94237743#5 94237743#6 94237743#7 94237743#8 94237743#9 94237743#10 94237743#11 94237743#12 94237743#13 94237743#14 94237743#15 94237743#16 94248374#0 94248374#1 94248374#2 94248374#3 94248376#0 94248376#1 94248376#2 94248376#3 94248376#4 94248376#5 613871663 1472328457 93164971#0 93164971#1 93164971#2"/>
+        <busStop id="5807318625" name="باب سعدون"/>
+        <busStop id="1095146798" name="باب العسل"/>
+        <busStop id="5807318588" name="باب الخضراء"/>
+        <busStop id="616142063" name="ساحة الجمهورية"/>
+        <busStop id="1094476493" name="ابن رشيق"/>
+        <busStop id="1094476124" name="فرحات حشاد"/>
+        <busStop id="1080016835" name="تونس البحرية"/>
+    </ptLine>
+    <ptLine id="1368402" name="خط 5 - الانطلاقة-ساحة برشلونة" line="5" type="light_rail" vClass="rail_urban" completeness="0.40" missingAfter="9">
+        <route edges="613857627 1223502958#0 1223502958#1 28973879#0 28973879#1 28973879#2 28973879#3 28973879#6 28973879#7 28973879#8 28973879#9 28973879#10 28973879#11 28973879#12 28973879#13 28973879#14 28973879#16 28973879#18 94248381#0 94248381#1 94248381#2 94237734#0 94237734#1 94237734#2 94237734#3 94237734#4 94237734#5 94237734#6"/>
+        <busStop id="1094483039" name="ساحة برشلونة"/>
+        <busStop id="1095145955" name="حبيب ثامر"/>
+        <busStop id="318594461" name="ساحة الجمهورية"/>
+        <busStop id="1095144771" name="باب الخضراء"/>
+        <busStop id="1095146798@1368402" name="باب العسل"/>
+        <busStop id="1095145544" name="باب سعدون"/>
+    </ptLine>
+    <ptLine id="1368621" name="خط ٦ - المروج ٤-تونس البحرية" line="6" type="light_rail" vClass="rail_urban" completeness="0.17" missingBefore="15">
+        <route edges="94352002#0 94352002#1 687746328 94161148#1 94160876 93164197#0 93164197#2 93164197#3 94248376#0 94248376#1 94248376#2 94248376#3 94248376#4 94248376#5 613871663 1472328457 93164971#0 93164971#1 93164971#2"/>
+        <busStop id="1094511110" name="ساحة برشلونة"/>
+        <busStop id="1094476124" name="فرحات حشاد"/>
+        <busStop id="1080016835" name="تونس البحرية"/>
+    </ptLine>
+    <ptLine id="1420736" name="خط تونس-حلق الوادي-المرسى" line="خط تونس-حلق الوادي-المرسى" type="light_rail" vClass="rail_urban" completeness="0.06" missingBefore="17">
+        <route edges="93265054 1125463857#0 1125463857#1 1125463857#2 903665554 93164171#1 93164171#2"/>
+        <busStop id="283636759" name="تونس البحرية"/>
+    </ptLine>
+    <ptLine id="15654114" name="خط E : بوقطفة-سيدي حسين - تونس" line="E" type="train" vClass="rail" completeness="0.14" missingBefore="6">
+        <busStop id="10767225141" name="تونس"/>
+    </ptLine>
+    <ptLine id="15654115" name="خط E : تونس - بوقطفة-سيدي حسين" line="E" type="train" vClass="rail" completeness="0.14" missingAfter="6">
+        <busStop id="10767225142" name="تونس"/>
+    </ptLine>
+    <ptLine id="19283055" name="Bus 12 : Jardin Thameur --&gt; Terminus Zayatine" line="12" type="bus" vClass="bus" completeness="0.10" missingAfter="9">
+        <route edges="56681325#0 56681325#1 56681325#2 56681325#3"/>
+        <busStop id="1103531608" name=""/>
+    </ptLine>
+    <ptLine id="19283575" name="Bus 12 : Terminus Zayatine --&gt; Jardin Thameur" line="12" type="bus" vClass="bus" completeness="0.10" missingBefore="9">
+        <busStop id="1103531608" name=""/>
+    </ptLine>
+    <ptLine id="19283576" name="Bus 12 : Jardin Thameur --&gt; Terminus Zayatine" line="12" type="bus" vClass="bus" completeness="0.10" missingAfter="9">
+        <route edges="56681325#0 56681325#1 56681325#2 56681325#3"/>
+        <busStop id="1103531608" name=""/>
+    </ptLine>
+    <ptLine id="2014910" line="20" type="bus" vClass="bus" completeness="0.33" missingBefore="1" missingAfter="1">
+        <route edges="106509678#0 106509678#1 106509678#2 106509678#3 106509678#4 106509678#5 106509678#6 33803050 93808393#0 93808393#1 93808393#2 93808393#3 93808393#4 93808393#5 93808393#6 93808393#7 987899464#0 987899464#2 987899464#3"/>
+        <busStop id="1183577041" name=""/>
+    </ptLine>
+    <ptLine id="3304108" line="63" type="bus" vClass="bus" color="cyan" completeness="0.43" missingAfter="4">
+        <route edges="106509678#0 106509678#1 106509678#2 106509678#3 106509678#4 106509678#5 106509678#6 33803050 93808393#0 93808393#1 93808393#2 93808393#3 93808393#4 93808393#5 93808393#6 93808393#7 32956400#0 32956400#1 32956400#2 32956400#4 32956400#5 32956400#6 32956400#7 32956400#8 32956400#9 32956400#10 94210253#1 94210253#2 94210253#3"/>
+        <busStop id="1103531608" name=""/>
+        <busStop id="387151797" name=""/>
+        <busStop id="2517195465" name="جامع الفتح"/>
+    </ptLine>
+    <ptLine id="3316983" name="تونس - برج السدرية، الرياض" line="خط الضاحية الجنوبية لتونس" type="train" vClass="rail" completeness="0.08" missingBefore="1" missingAfter="34">
+        <route edges="25057272 104206508 1008142434"/>
+        <busStop id="2008352612" name="مقرين الرياض"/>
+        <busStop id="2008351993" name="مقرين"/>
+        <busStop id="2008351987" name="مقرين"/>
+    </ptLine>
+    <ptLine id="8501148" name="خط 4 - خير الدين-تونس البحرية" line="4" type="light_rail" vClass="rail_urban" completeness="0.36" missingAfter="14">
+        <route edges="-756034110 613857632 613871673#0 613871673#1 613871673#2 613871673#3 613871673#4 613871673#5 613871673#6 613871673#7 613871673#8 613871673#9 613871673#10 686514116#0 686514116#1 1223502957 94165476#0 94165476#2 28973879#0 28973879#1 28973879#2 28973879#3 28973879#6 28973879#7 28973879#8 28973879#9 28973879#10 28973879#11 28973879#12 28973879#13 28973879#14 28973879#16 28973879#18 94248381#0 94248381#1 94248381#2 94237734#0 94237734#1 94237734#2 94237734#3 94237734#4 94237734#5 94237734#6"/>
+        <busStop id="-1080014547" name="تونس البحرية"/>
+        <busStop id="5807445626" name="فرحات حشاد"/>
+        <busStop id="1094510272" name="ساحة برشلونة"/>
+        <busStop id="1095145955" name="حبيب ثامر"/>
+        <busStop id="318594461" name="ساحة الجمهورية"/>
+        <busStop id="1095144771" name="باب الخضراء"/>
+        <busStop id="1095146798@1368402" name="باب العسل"/>
+        <busStop id="1095145544" name="باب سعدون"/>
+    </ptLine>
+    <ptLine id="8510679" name="خط 5 - الانطلاقة-ساحة برشلونة" line="5" type="light_rail" vClass="rail_urban" completeness="0.40" missingBefore="9">
+        <route edges="94237727#0 94237727#1 94237727#2 94237727#3 94237727#4 94237727#5 94237727#6 94237727#7 94237727#8 94237727#9 28974100#0 28974100#1 94237743#0 94237743#1 94237743#2 94237743#4 94237743#5 94237743#6 94237743#7 94237743#8 94237743#9 94237743#10 94237743#11 94237743#12 94237743#13 94237743#14 94237743#15 94237743#16 94248377#0 94248377#1 686514116#0 686514116#1 1223502957 94165476#0 94165476#2"/>
+        <busStop id="5807318625" name="باب سعدون"/>
+        <busStop id="5807318593" name="باب العسل"/>
+        <busStop id="5807318588" name="باب الخضراء"/>
+        <busStop id="616142063" name="ساحة الجمهورية"/>
+        <busStop id="1094476493" name="ابن رشيق"/>
+        <busStop id="1094910475" name="ساحة برشلونة"/>
+    </ptLine>
+    <ptLine id="8510787" name="خط 3 - ابن خلدون-ساحة برشلونة" line="3" type="light_rail" vClass="rail_urban" completeness="0.50" missingAfter="6">
+        <route edges="613857627 1223502958#0 1223502958#1 28973879#0 28973879#1 28973879#2 28973879#3 28973879#6 28973879#7 28973879#8 28973879#9 28973879#10 28973879#11 28973879#12 28973879#13 28973879#14 28973879#16 28973879#18 94248381#0 94248381#1 94248381#2 94237734#0 94237734#1 94237734#2 94237734#3 94237734#4 94237734#5 94237734#6"/>
+        <busStop id="1094483039" name="ساحة برشلونة"/>
+        <busStop id="1095145955" name="حبيب ثامر"/>
+        <busStop id="318594461" name="ساحة الجمهورية"/>
+        <busStop id="1095144771" name="باب الخضراء"/>
+        <busStop id="1095146798@1368402" name="باب العسل"/>
+        <busStop id="1095145544" name="باب سعدون"/>
+    </ptLine>
+    <ptLine id="9525004" name="خط 1: ساحة برشلونة - بن عروس" line="1" type="light_rail" vClass="rail_urban" completeness="0.09" missingAfter="10">
+        <busStop id="5807445642" name="ساحة برشلونة"/>
+    </ptLine>
+    <ptLine id="9530552" name="خط 2 - ساحة الجمهورية =&gt; أريانة" line="2" type="light_rail" vClass="rail_urban" completeness="0.17" missingAfter="10">
+        <busStop id="1094910245" name="ساحة الجمهورية"/>
+        <busStop id="5807318037" name="نيلسون مانديلا"/>
+    </ptLine>
+    <ptLine id="9530553" name="خط 6 - المروج 4-تونس البحرية" line="6" type="light_rail" vClass="rail_urban" completeness="0.17" missingAfter="15">
+        <route edges="-756034110 613857632 613871673#0 613871673#1 613871673#2 613871673#3 613871673#4 613871673#5 613871673#6 613871673#7 613871673#8 613871673#9 613871673#10 686514116#0 686514116#1 687746329#0 687746329#1 613871675#1 613871675#2"/>
+        <busStop id="-1080014547" name="تونس البحرية"/>
+        <busStop id="5807445626" name="فرحات حشاد"/>
+        <busStop id="5807445642" name="ساحة برشلونة"/>
+    </ptLine>
+</ptLines>

@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tsyp14.local/schemas/decision.schema.json",
+  "title": "Brain decision log entry (Brain -> all; MQTT brain/decisions)",
+  "description": "",
+  "type": "object",
+  "properties": {
+    "contract_version": {
+      "type": "string",
+      "pattern": "^1\\.[0-9]+$",
+      "description": "Contract version; this repository speaks 1.x"
+    },
+    "type": {
+      "const": "decision"
+    },
+    "event": {
+      "type": "string"
+    },
+    "incident_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "incident": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "sensor_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "zone_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "actuator": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "tool": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "tier": {
+      "enum": [
+        "A",
+        "B",
+        null
+      ]
+    },
+    "verdict": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "trust": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "reasons": {
+      "type": "array"
+    },
+    "verdict_ref": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "ts": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z$",
+      "description": "UTC ISO-8601"
+    },
+    "sig": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "HMAC-SHA256 (hex) over the message without sig, keys sorted, separators (',', ':')"
+    }
+  },
+  "required": [
+    "contract_version",
+    "type",
+    "event",
+    "ts"
+  ],
+  "additionalProperties": true
+}

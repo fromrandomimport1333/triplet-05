@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2026-11-06T14:41:15.793435+01:00 by Eclipse SUMO netconvert 1.28.0
+<netconvertConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/netconvertConfiguration.xsd">
+
+    <input>
+        <type-files value="${SUMO_HOME}\data\typemap\osmNetconvert.typ.xml,${SUMO_HOME}\data\typemap\osmNetconvertUrbanDe.typ.xml,${SUMO_HOME}\data\typemap\osmNetconvertPedestrians.typ.xml,${SUMO_HOME}\data\typemap\osmNetconvertShips.typ.xml,${SUMO_HOME}\data\typemap\osmNetconvertAerialway.typ.xml"/>
+        <osm-files value="osm_bbox.osm.xml.gz"/>
+    </input>
+
+    <output>
+        <output-file value="osm.net.xml.gz"/>
+        <output.street-names value="true"/>
+        <output.original-names value="true"/>
+        <ptstop-output value="osm_stops.add.xml"/>
+        <ptline-output value="osm_ptlines.xml"/>
+        <ptline-clean-up value="true"/>
+    </output>
+
+    <projection>
+        <proj.utm value="true"/>
+    </projection>
+
+    <processing>
+        <geometry.remove value="true"/>
+    </processing>
+
+    <tls_building>
+        <tls.discard-simple value="true"/>
+        <tls.join value="true"/>
+        <tls.guess-signals value="true"/>
+        <tls.default-type value="actuated"/>
+    </tls_building>
+
+    <ramp_guessing>
+        <ramps.guess value="true"/>
+    </ramp_guessing>
+
+    <junctions>
+        <junctions.join value="true"/>
+    </junctions>
+
+    <pedestrian>
+        <crossings.guess value="true"/>
+    </pedestrian>
+
+    <railway>
+        <railway.topology.repair value="true"/>
+    </railway>
+
+    <formats>
+        <osm.sidewalks value="true"/>
+    </formats>
+
+</netconvertConfiguration>
+-->
+
+<additional xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/additional_file.xsd">
+    <trainStop id="-1080014547" name="تونس البحرية" lane="-756034110_0" startPos="0.00" endPos="74.06" friendlyPos="true">
+        <access lane="756027814_0" pos="0.00" length="84.18" friendlyPos="1"/>
+        <access lane="756027815_0" pos="0.20" length="78.92" friendlyPos="1"/>
+        <access lane="756027816_0" pos="0.00" length="80.81" friendlyPos="1"/>
+        <access lane="756027822#1_0" pos="0.50" length="87.90" friendlyPos="1"/>
+        <access lane="756027822#2_0" pos="0.20" length="82.71" friendlyPos="1"/>
+    </trainStop>
+    <trainStop id="10767225141" name="تونس" lane="1223326590#0_0" startPos="0.00" endPos="200.00" friendlyPos="true">
+        <access lane="109431626#1_0" pos="9.74" length="164.58" friendlyPos="1"/>
+        <access lane="1432281143#0_0" pos="0.20" length="165.94" friendlyPos="1"/>
+        <access lane="1432281143#1_0" pos="0.20" length="164.59" friendlyPos="1"/>
+        <access lane="1432281143#2_0" pos="2.73" length="164.52" friendlyPos="1"/>
+        <access lane="1432281143#3_0" pos="9.70" length="163.48" friendlyPos="1"/>
+    </trainStop>
+    <trainStop id="10767225142" name="تونس" lane="25057283#0_0" startPos="0.00" endPos="200.00" friendlyPos="true">
+        <access lane="1432281139_0" pos="0.00" length="167.48" friendlyPos="1"/>
+        <access lane="1432281143#0_0" pos="0.20" length="163.41" friendlyPos="1"/>
+        <access lane="1432281143#1_0" pos="0.20" length="162.52" friendlyPos="1"/>
+        <access lane="1432281143#2_0" pos="0.00" length="163.06" friendlyPos="1"/>
+        <access lane="1432281143#3_0" pos="1.67" length="163.42" friendlyPos="1"/>
+    </trainStop>
+    <trainStop id="1080016835" name="تونس البحرية" lane="93164971#2_0" startPos="0.00" endPos="92.19" friendlyPos="true" lines="4 6">
+        <access lane="756027814_0" pos="0.00" length="85.21" friendlyPos="1"/>
+        <access lane="756027815_0" pos="0.20" length="79.40" friendlyPos="1"/>
+        <access lane="756027816_0" pos="0.00" length="79.92" friendlyPos="1"/>
+        <access lane="756027822#1_0" pos="0.50" length="88.27" friendlyPos="1"/>
+        <access lane="756027822#2_0" pos="0.20" length="83.14" friendlyPos="1"/>
+    </trainStop>
+    <trainStop id="1094476124" name="فرحات حشاد" lane="94248376#1_0" startPos="52.09" endPos="252.09" friendlyPos="true" lines="4 6">
+        <access lane="-145244865_0" pos="86.90" length="61.51" friendlyPos="1"/>
+        <access lane="-184964430_0" pos="0.00" length="86.28" friendlyPos="1"/>
+        <access lane="1097930102_0" pos="0.00" length="104.88" friendlyPos="1"/>
+        <access lane="145244864_0" pos="0.00" length="56.89" friendlyPos="1"/>
+        <access lane="184964430_0" pos="35.38" length="73.78" friendlyPos="1"/>
+    </trainStop>
+    <trainStop id="1094476493" name="ابن رشيق" lane="94237743#9_0" startPos="0.00" endPos="73.53" friendlyPos="true" lines="3 4 5">
+        <access lane="-100081173#1_0" pos="46.76" length="63.60" friendlyPos="1"/>
+        <access lane="-1139250394_0" pos="0.00" length="15.07" friendlyPos="1"/>
+        <access lane="-32956396#6_0" pos="0.00" length="61.81" friendlyPos="1"/>
+        <access lane="100081173#1_0" pos="0.00" length="58.82" friendlyPos="1"/>
+        <access lane="1139250394_0" pos="1.95" length="18.63" friendlyPos="1"/>
+    </trainStop>
+    <trainStop id="1094483039" name="ساحة برشلونة" lane="1223502958#0_0" startPos="0.00" endPos="72.20" friendlyPos="true" lines="5 3">
+        <access lane="109431610_0" pos="10.91" length="40.57" friendlyPos="1"/>
+        <access lane="109431698#0_0" pos="43.61" length="24.74" friendlyPos="1"/>
+        <access lane="109431698#1_0" pos="0.00" length="40.92" friendlyPos="1"/>
+        <access lane="109431742#0_0" pos="16.37" length="55.18" friendlyPos="1"/>
+        <access lane="109431742#1_0" pos="12.02" length="48.91" friendlyPos="1"/>
+    </trainStop>
+    <trainStop id="1094510272" name="ساحة برشلونة" lane="94165476#0_0" startPos="0.00" endPos="97.16" friendlyPos="true" lines="4">
+        <access lane="109431610_0" pos="10.91" length="33.59" friendlyPos="1"/>
+        <access lane="109431698#0_0" pos="43.88" length="14.07" friendlyPos="1"/>
+        <access lane="109431698#1_0" pos="0.00" length="35.13" friendlyPos="1"/>
+        <access lane="109431742#0_0" pos="16.37" length="46.15" friendlyPos="1"/>
+        <access lane="109431742#1_0" pos="12.22" length="38.24" friendlyPos="1"/>
+    </trainStop>
+    <trainStop id="1094511110" name="ساحة برشلونة" lane="687746328_0" startPos="0.00" endPos="152.96" friendlyPos="true" lines="1 6">
+        <access lane="-109431771#1_0" pos="38.13" length="22.20" friendlyPos="1"/>
+        <access lane="109431771#1_0" pos="18.06" length="27.26" friendlyPos="1"/>
+        <access lane="1223503008_0" pos="16.45" length="15.36" friendlyPos="1"/>
+        <access lane="1223503011_0" pos="0.00" length="18.12" friendlyPos="1"/>
+        <access lane="1223782059_0" pos="0.00" length="28.40" friendlyPos="1"/>
+    </trainStop>
+    <trainStop id="1094892860" name="ساحة الجمهورية" lane="94210236#2_0" startPos="0.00" endPos="164.72" friendlyPos="true" lines="2">
+        <access lane="-1150321469_0" pos="18.34" length="20.80" friendlyPos="1"/>
+        <access lane="-32956395#0_0" pos="31.25" length="85.43" friendlyPos="1"/>
+        <access lane="1150321469_0" pos="25.57" length="25.60" friendlyPos="1"/>
+        <access lane="32956395#0_0" pos="0.00" length="80.03" friendlyPos="1"/>
+        <access lane="32956395#1_0" pos="0.00" length="129.69" friendlyPos="1"/>
+    </trainStop>
+    <trainStop id="1094907123" name="نيلسون مانديلا" lane="686935564#0_0" startPos="0.00" endPos="200.00" friendlyPos="true" lines="2">
+        <access lane="-93808400#13_0" pos="773.27" length="296.92" friendlyPos="1"/>
+        <access lane="-93808420#1_0" pos="287.68" length="263.63" friendlyPos="1"/>
+        <access lane="93808400#12_0" pos="456.21" length="304.72" friendlyPos="1"/>
+        <access lane="93808420#0_0" pos="237.94" length="255.83" friendlyPos="1"/>
+        <access lane="94346392#3_0" pos="509.24" length="292.14" friendlyPos="1"/>
+    </trainStop>
+    <trainStop id="1094910245" name="ساحة الجمهورية" lane="687681278_0" startPos="0.00" endPos="151.14" friendlyPos="true">
+        <access lane="-1150321469_0" pos="16.16" length="30.86" friendlyPos="1"/>
+        <access lane="-32956395#0_0" pos="31.25" length="95.33" friendlyPos="1"/>
+        <access lane="1150321469_0" pos="27.75" length="35.66" friendlyPos="1"/>
+        <access lane="1409406887#6_0" pos="1.10" length="133.67" friendlyPos="1"/>
+        <access lane="32956395#0_0" pos="0.00" length="89.68" friendlyPos="1"/>
+    </trainStop>
+    <trainStop id="1094910475" name="ساحة برشلونة" lane="1223502957_0" startPos="0.00" endPos="93.30" friendlyPos="true" lines="3 5">
+        <access lane="109431698#1_0" pos="21.41" length="41.57" friendlyPos="1"/>
+        <access lane="109431698#2_0" pos="11.74" length="33.16" friendlyPos="1"/>
+        <access lane="1223503008_0" pos="3.69" length="14.55" friendlyPos="1"/>
+        <access lane="1223503011_0" pos="0.00" length="32.23" friendlyPos="1"/>
+        <access lane="1223503012_0" pos="0.00" length="17.67" friendlyPos="1"/>
+    </trainStop>
+    <trainStop id="1095144771" name="باب الخضراء" lane="94237734#4_0" startPos="374.61" endPos="574.61" friendlyPos="true" lines="5 4 3"/>
+    <trainStop id="1095145544" name="باب سعدون" lane="94237734#6_0" startPos="69.93" endPos="269.93" friendlyPos="true" lines="5 4 3"/>
+    <trainStop id="1095145955" name="حبيب ثامر" lane="28973879#12_0" startPos="0.00" endPos="178.08" friendlyPos="true" lines="5 4 3">
+        <access lane="-109385790#0_0" pos="0.00" length="75.97" friendlyPos="1"/>
+        <access lane="-109385790#1_0" pos="23.89" length="74.10" friendlyPos="1"/>
+        <access lane="-109431718_0" pos="0.00" length="39.07" friendlyPos="1"/>
+        <access lane="109385790#1_0" pos="6.17" length="81.90" friendlyPos="1"/>
+        <access lane="109431718_0" pos="68.04" length="50.83" friendlyPos="1"/>
+    </trainStop>
+    <busStop id="1095146798" name="باب العسل" lane="94237727#1_0" startPos="506.85" endPos="521.85" friendlyPos="true" lines="4"/>
+    <busStop id="1095146798@1368402" name="باب العسل" lane="94237734#5_0" startPos="79.04" endPos="94.04" friendlyPos="true" lines="5 4 3"/>
+    <busStop id="1103531608" lane="56681325#0_0" startPos="0.00" endPos="15.00" friendlyPos="true" lines="12">
+        <access lane="109431636#0_0" pos="77.78" length="14.87" friendlyPos="1"/>
+        <access lane="109431724#0_0" pos="84.82" length="24.73" friendlyPos="1"/>
+        <access lane="109431724#1_0" pos="0.38" length="8.30" friendlyPos="1"/>
+        <access lane="109431751#3_0" pos="5.11" length="23.24" friendlyPos="1"/>
+        <access lane="109431753_0" pos="96.56" length="23.17" friendlyPos="1"/>
+    </busStop>
+    <trainStop id="1146894481" name="تونس البحرية" lane="756027830#0_0" startPos="0.00" endPos="85.43" friendlyPos="true" lines="تونس - حلق الوادي - المرسى">
+        <access lane="677496561#4_0" pos="88.00" length="47.12" friendlyPos="1"/>
+        <access lane="677496562#0_0" pos="0.20" length="41.75" friendlyPos="1"/>
+        <access lane="677496562#1_0" pos="0.20" length="33.97" friendlyPos="1"/>
+        <access lane="93264730#1_0" pos="0.00" length="36.96" friendlyPos="1"/>
+        <access lane="93264730#3_0" pos="20.33" length="35.65" friendlyPos="1"/>
+    </trainStop>
+    <busStop id="1183577041" lane="19800017_0" startPos="0.00" endPos="0.20" friendlyPos="true">
+        <access lane="-93808400#13_0" pos="0.00" length="13.55" friendlyPos="1"/>
+        <access lane="-93808400#16_0" pos="422.26" length="13.94" friendlyPos="1"/>
+        <access lane="93808400#12_0" pos="1231.28" length="18.86" friendlyPos="1"/>
+        <access lane="94346392#3_0" pos="1281.76" length="13.11" friendlyPos="1"/>
+        <access lane="94346392#5_0" pos="0.00" length="13.88" friendlyPos="1"/>
+    </busStop>
+    <trainStop id="2008351987" name="مقرين" lane="103510260#1_0" startPos="5610.03" endPos="5810.03" friendlyPos="true" lines="خط الضاحية الجنوبية لتونس"/>
+    <trainStop id="2008351993" name="مقرين" lane="104206508_0" startPos="5486.83" endPos="5686.83" friendlyPos="true"/>
+    <trainStop id="2008352612" name="مقرين الرياض" lane="103510260#1_0" startPos="4655.61" endPos="4855.61" friendlyPos="true" lines="خط الضاحية الجنوبية لتونس"/>
+    <busStop id="2517195465" name="جامع الفتح" lane="32956400#10_0" startPos="162.19" endPos="177.19" friendlyPos="true" lines="63">
+        <access lane="-110150453#1_0" pos="11.02" length="92.82" friendlyPos="1"/>
+        <access lane="-503755160_0" pos="81.61" length="94.20" friendlyPos="1"/>
+        <access lane="110150453#1_0" pos="4.76" length="98.05" friendlyPos="1"/>
+        <access lane="110150457#1_0" pos="13.05" length="98.75" friendlyPos="1"/>
+        <access lane="503755160_0" pos="0.00" length="96.62" friendlyPos="1"/>
+    </busStop>
+    <trainStop id="283636759" name="تونس البحرية" lane="93164171#2_0" startPos="0.00" endPos="104.62" friendlyPos="true" lines="خط تونس-حلق الوادي-المرسى">
+        <access lane="677496561#4_0" pos="88.00" length="35.21" friendlyPos="1"/>
+        <access lane="677496562#0_0" pos="0.20" length="27.90" friendlyPos="1"/>
+        <access lane="677496562#1_0" pos="0.20" length="18.67" friendlyPos="1"/>
+        <access lane="93264730#1_0" pos="0.00" length="23.35" friendlyPos="1"/>
+        <access lane="93264730#3_0" pos="20.33" length="20.26" friendlyPos="1"/>
+    </trainStop>
+    <trainStop id="318594461" name="ساحة الجمهورية" lane="94248381#0_0" startPos="0.00" endPos="170.00" friendlyPos="true" lines="5 4 3">
+        <access lane="-1150321469_0" pos="13.33" length="55.41" friendlyPos="1"/>
+        <access lane="-32956395#0_0" pos="31.25" length="117.97" friendlyPos="1"/>
+        <access lane="1150321469_0" pos="30.57" length="60.21" friendlyPos="1"/>
+        <access lane="1409406887#5_0" pos="0.20" length="129.58" friendlyPos="1"/>
+        <access lane="32956395#0_0" pos="0.00" length="111.78" friendlyPos="1"/>
+    </trainStop>
+    <busStop id="387151797" lane="32956400#9_0" startPos="24.48" endPos="24.48" friendlyPos="true" lines="63">
+        <access lane="-1150321469_0" pos="43.91" length="78.27" friendlyPos="1"/>
+        <access lane="-32956395#0_0" pos="31.25" length="35.66" friendlyPos="1"/>
+        <access lane="-32956395#1_0" pos="82.43" length="77.05" friendlyPos="1"/>
+        <access lane="1150321469_0" pos="0.00" length="73.48" friendlyPos="1"/>
+        <access lane="32956395#0_0" pos="0.00" length="43.20" friendlyPos="1"/>
+    </busStop>
+    <trainStop id="5807318037" name="نيلسون مانديلا" lane="94210247#4_0" startPos="244.00" endPos="444.00" friendlyPos="true">
+        <access lane="-93808400#13_0" pos="774.04" length="291.68" friendlyPos="1"/>
+        <access lane="-93808420#1_0" pos="287.47" length="258.39" friendlyPos="1"/>
+        <access lane="93808400#12_0" pos="455.44" length="299.48" friendlyPos="1"/>
+        <access lane="93808420#0_0" pos="238.16" length="250.59" friendlyPos="1"/>
+        <access lane="94346392#3_0" pos="508.47" length="286.89" friendlyPos="1"/>
+    </trainStop>
+    <trainStop id="5807318588" name="باب الخضراء" lane="94237727#2_0" startPos="350.00" endPos="550.00" friendlyPos="true" lines="3 4 5"/>
+    <trainStop id="5807318593" name="باب العسل" lane="94237727#2_0" startPos="0.00" endPos="200.00" friendlyPos="true" lines="3 5"/>
+    <trainStop id="5807318625" name="باب سعدون" lane="94237727#0_0" startPos="275.98" endPos="475.98" friendlyPos="true" lines="3 4 5"/>
+    <trainStop id="5807445626" name="فرحات حشاد" lane="613871673#5_0" startPos="0.00" endPos="200.00" friendlyPos="true" lines="4 6">
+        <access lane="-145244865_0" pos="86.90" length="60.50" friendlyPos="1"/>
+        <access lane="-184964430_0" pos="0.00" length="86.98" friendlyPos="1"/>
+        <access lane="1097930102_0" pos="0.00" length="101.80" friendlyPos="1"/>
+        <access lane="145244864_0" pos="0.00" length="55.80" friendlyPos="1"/>
+        <access lane="184964430_0" pos="35.38" length="74.59" friendlyPos="1"/>
+    </trainStop>
+    <trainStop id="5807445642" name="ساحة برشلونة" lane="687746329#1_0" startPos="0.00" endPos="142.02" friendlyPos="true" lines="6">
+        <access lane="109431738_0" pos="20.17" length="31.20" friendlyPos="1"/>
+        <access lane="1223503008_0" pos="11.23" length="14.38" friendlyPos="1"/>
+        <access lane="1223503011_0" pos="0.00" length="22.61" friendlyPos="1"/>
+        <access lane="1223503012_0" pos="0.00" length="25.73" friendlyPos="1"/>
+        <access lane="1223782059_0" pos="0.00" length="34.85" friendlyPos="1"/>
+    </trainStop>
+    <trainStop id="616142063" name="ساحة الجمهورية" lane="28974100#0_0" startPos="0.00" endPos="147.17" friendlyPos="true" lines="3 4 5">
+        <access lane="-1150321469_0" pos="15.30" length="43.78" friendlyPos="1"/>
+        <access lane="-32956395#0_0" pos="31.25" length="106.60" friendlyPos="1"/>
+        <access lane="1150321469_0" pos="28.60" length="48.58" friendlyPos="1"/>
+        <access lane="1409406887#5_0" pos="0.20" length="130.16" friendlyPos="1"/>
+        <access lane="32956395#0_0" pos="0.00" length="100.59" friendlyPos="1"/>
+    </trainStop>
+</additional>

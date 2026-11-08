@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2026-11-06 14:41:18.516067 by Eclipse SUMO osmWebWizard.py v1_28_0+0000-daf91b55789
+<configuration>
+    <net-file value="C:\Users\AZIZ\Desktop\tsyp\2026-11-06-14-41-01\osm.net.xml.gz"/>
+    <ptlines-file value="C:\Users\AZIZ\Desktop\tsyp\2026-11-06-14-41-01\osm_ptlines.xml"/>
+    <ptstops-file value="C:\Users\AZIZ\Desktop\tsyp\2026-11-06-14-41-01\osm_stops.add.xml"/>
+    <output-file value="C:\Users\AZIZ\Desktop\tsyp\2026-11-06-14-41-01\osm_pt.rou.xml"/>
+    <stopinfos-file value="C:\Users\AZIZ\Desktop\tsyp\2026-11-06-14-41-01\stopinfos.xml"/>
+    <routes-file value="C:\Users\AZIZ\Desktop\tsyp\2026-11-06-14-41-01\vehroutes.xml"/>
+    <trips-file value="C:\Users\AZIZ\Desktop\tsyp\2026-11-06-14-41-01\trips.trips.xml"/>
+    <min-stops value="0"/>
+    <extend-to-fringe value="True"/>
+    <random-begin value="True"/>
+    <seed value="42"/>
+    <ignore-errors value="True"/>
+    <types value="bus,tram,subway,light_rail,train,trolleybus,monorail,minibus,share_taxi,ferry,aerialway"/>
+    <vtype-prefix value="pt_"/>
+    <verbose value="True"/>
+</configuration>
+-->
+
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+    <vType id="pt_bus" vClass="bus"/>
+    <vType id="pt_tram" vClass="tram"/>
+    <vType id="pt_train" vClass="rail"/>
+    <vType id="pt_subway" vClass="subway"/>
+    <vType id="pt_light_rail" vClass="rail_urban"/>
+    <vType id="pt_monorail" vClass="rail_urban"/>
+    <vType id="pt_trolleybus" vClass="bus"/>
+    <vType id="pt_minibus" vClass="bus"/>
+    <vType id="pt_share_taxi" vClass="taxi"/>
+    <vType id="pt_aerialway" vClass="cable_car" length="2.5" width="2" personCapacity="4"/>
+    <vType id="pt_ferry" vClass="ship"/>
+    <route id="pt_bus_12:0" edges="56681325#0 56681325#1 56681325#2 56681325#3" >
+        <stop busStop="1103531608" duration="20" until="35.0"/> <!-- None -->
+    </route>
+    <route id="pt_bus_12:1" edges="56681325#0" >
+        <stop busStop="1103531608" duration="20" until="34.0"/> <!-- None -->
+    </route>
+    <route id="pt_bus_12:2" edges="56681325#0 56681325#1 56681325#2 56681325#3" >
+        <stop busStop="1103531608" duration="20" until="34.0"/> <!-- None -->
+    </route>
+    <route id="pt_bus_20:0" edges="19800017" >
+        <stop busStop="1183577041" duration="20" until="31.0"/> <!-- None -->
+    </route>
+    <route id="pt_bus_63:0" color="cyan" edges="56681325#0 56681325#1 56681325#2 56681324 106509678#1 106509678#2 106509678#3 106509678#4 106509678#5 106509678#6 94346390#0 94346390#1 32956400#9 32956400#10 94210253#1 94210253#2 94210253#3" >
+        <stop busStop="1103531608" duration="20" until="34.0"/> <!-- None -->
+        <stop busStop="387151797" duration="20" until="135.0"/> <!-- None -->
+        <stop busStop="2517195465" duration="20" until="188.0"/> <!-- جامع الفتح -->
+    </route>
+    <route id="pt_light_rail_1:0" edges="94352002#0 94352002#1 687746328" >
+        <stop busStop="1094511110" duration="20" until="79.0"/> <!-- ساحة برشلونة -->
+    </route>
+    <route id="pt_light_rail_1:1" edges="687746329#1" >
+        <stop busStop="5807445642" duration="20" until="40.0"/> <!-- ساحة برشلونة -->
+    </route>
+    <route id="pt_light_rail_2:0" edges="686935564#0 686935564#1 94210236#0 94210236#1 94210236#2" >
+        <stop busStop="1094907123" duration="20" until="46.0"/> <!-- نيلسون مانديلا -->
+        <stop busStop="1094892860" duration="20" until="111.0"/> <!-- ساحة الجمهورية -->
+    </route>
+    <route id="pt_light_rail_2:1" edges="687681278 94210247#1 94210247#2 94210247#3 94210247#4" >
+        <stop busStop="1094910245" duration="20" until="41.0"/> <!-- ساحة الجمهورية -->
+        <stop busStop="5807318037" duration="20" until="116.0"/> <!-- نيلسون مانديلا -->
+    </route>
+    <route id="pt_light_rail_3:0" edges="94237727#0 94237727#1 94237727#2 94237727#3 94237727#4 94237727#5 94237727#6 94237727#7 94237727#8 94237727#9 28974100#0 28974100#1 94237743#0 94237743#1 94237743#2 94237743#4 94237743#5 94237743#6 94237743#7 94237743#8 94237743#9 94237743#10 94237743#11 94237743#12 94237743#13 94237743#14 94237743#15 94237743#16 94248377#0 94248377#1 686514116#0 686514116#1 1223502957 94165476#0 94165476#2" >
+        <stop busStop="5807318625" duration="20" until="62.0"/> <!-- باب سعدون -->
+        <stop busStop="5807318593" duration="20" until="142.0"/> <!-- باب العسل -->
+        <stop busStop="5807318588" duration="20" until="202.0"/> <!-- باب الخضراء -->
+        <stop busStop="616142063" duration="20" until="284.0"/> <!-- ساحة الجمهورية -->
+        <stop busStop="1094476493" duration="20" until="355.0"/> <!-- ابن رشيق -->
+        <stop busStop="1094910475" duration="20" until="424.0"/> <!-- ساحة برشلونة -->
+    </route>
+    <route id="pt_light_rail_3:1" edges="613857627 1223502958#0 1223502958#1 28973879#0 28973879#1 28973879#2 28973879#3 28973879#6 28973879#7 28973879#8 28973879#9 28973879#10 28973879#11 28973879#12 28973879#13 28973879#14 28973879#16 28973879#18 94248381#0 94248381#1 94248381#2 94237734#0 94237734#1 94237734#2 94237734#3 94237734#4 94237734#5 94237734#6" >
+        <stop busStop="1094483039" duration="20" until="46.0"/> <!-- ساحة برشلونة -->
+        <stop busStop="1095145955" duration="20" until="128.0"/> <!-- حبيب ثامر -->
+        <stop busStop="318594461" duration="20" until="194.0"/> <!-- ساحة الجمهورية -->
+        <stop busStop="1095144771" duration="20" until="278.0"/> <!-- باب الخضراء -->
+        <stop busStop="1095146798@1368402" duration="20" until="342.0"/> <!-- باب العسل -->
+        <stop busStop="1095145544" duration="20" until="418.0"/> <!-- باب سعدون -->
+    </route>
+    <route id="pt_light_rail_4:0" edges="94237727#0 94237727#1 94237727#2 94237727#3 94237727#4 94237727#5 94237727#6 94237727#7 94237727#8 94237727#9 28974100#0 28974100#1 94237743#0 94237743#1 94237743#2 94237743#4 94237743#5 94237743#6 94237743#7 94237743#8 94237743#9 94237743#10 94237743#11 94237743#12 94237743#13 94237743#14 94237743#15 94237743#16 94248374#0 94248374#1 94248374#2 94248374#3 94248376#0 94248376#1 94248376#2 94248376#3 94248376#4 94248376#5 613871663 613871672#0 93164249#0 1352666188 93164971#2" >
+        <stop busStop="5807318625" duration="20" until="62.0"/> <!-- باب سعدون -->
+        <stop busStop="1095146798" duration="20" until="132.0"/> <!-- باب العسل -->
+        <stop busStop="5807318588" duration="20" until="203.0"/> <!-- باب الخضراء -->
+        <stop busStop="616142063" duration="20" until="285.0"/> <!-- ساحة الجمهورية -->
+        <stop busStop="1094476493" duration="20" until="356.0"/> <!-- ابن رشيق -->
+        <stop busStop="1094476124" duration="20" until="431.0"/> <!-- فرحات حشاد -->
+        <stop busStop="1080016835" duration="20" until="506.0"/> <!-- تونس البحرية -->
+    </route>
+    <route id="pt_light_rail_4:1" edges="-756034110 613857632 613871673#0 613871673#1 613871673#2 613871673#3 613871673#4 613871673#5 613871673#6 613871673#7 613871673#8 613871673#9 613871673#10 686514116#0 686514116#1 1223502957 94165476#0 94165476#2 28973879#0 28973879#1 28973879#2 28973879#3 28973879#6 28973879#7 28973879#8 28973879#9 28973879#10 28973879#11 28973879#12 28973879#13 28973879#14 28973879#16 28973879#18 94248381#0 94248381#1 94248381#2 94237734#0 94237734#1 94237734#2 94237734#3 94237734#4 94237734#5 94237734#6" >
+        <stop busStop="-1080014547" duration="20" until="31.0"/> <!-- تونس البحرية -->
+        <stop busStop="5807445626" duration="20" until="110.0"/> <!-- فرحات حشاد -->
+        <stop busStop="1094510272" duration="20" until="191.0"/> <!-- ساحة برشلونة -->
+        <stop busStop="1095145955" duration="20" until="273.0"/> <!-- حبيب ثامر -->
+        <stop busStop="318594461" duration="20" until="339.0"/> <!-- ساحة الجمهورية -->
+        <stop busStop="1095144771" duration="20" until="423.0"/> <!-- باب الخضراء -->
+        <stop busStop="1095146798@1368402" duration="20" until="487.0"/> <!-- باب العسل -->
+        <stop busStop="1095145544" duration="20" until="563.0"/> <!-- باب سعدون -->
+    </route>
+    <route id="pt_light_rail_5:0" edges="613857627 1223502958#0 1223502958#1 28973879#0 28973879#1 28973879#2 28973879#3 28973879#6 28973879#7 28973879#8 28973879#9 28973879#10 28973879#11 28973879#12 28973879#13 28973879#14 28973879#16 28973879#18 94248381#0 94248381#1 94248381#2 94237734#0 94237734#1 94237734#2 94237734#3 94237734#4 94237734#5 94237734#6" >
+        <stop busStop="1094483039" duration="20" until="46.0"/> <!-- ساحة برشلونة -->
+        <stop busStop="1095145955" duration="20" until="128.0"/> <!-- حبيب ثامر -->
+        <stop busStop="318594461" duration="20" until="194.0"/> <!-- ساحة الجمهورية -->
+        <stop busStop="1095144771" duration="20" until="278.0"/> <!-- باب الخضراء -->
+        <stop busStop="1095146798@1368402" duration="20" until="342.0"/> <!-- باب العسل -->
+        <stop busStop="1095145544" duration="20" until="418.0"/> <!-- باب سعدون -->
+    </route>
+    <route id="pt_light_rail_5:1" edges="94237727#0 94237727#1 94237727#2 94237727#3 94237727#4 94237727#5 94237727#6 94237727#7 94237727#8 94237727#9 28974100#0 28974100#1 94237743#0 94237743#1 94237743#2 94237743#4 94237743#5 94237743#6 94237743#7 94237743#8 94237743#9 94237743#10 94237743#11 94237743#12 94237743#13 94237743#14 94237743#15 94237743#16 94248377#0 94248377#1 686514116#0 686514116#1 1223502957 94165476#0 94165476#2" >
+        <stop busStop="5807318625" duration="20" until="62.0"/> <!-- باب سعدون -->
+        <stop busStop="5807318593" duration="20" until="142.0"/> <!-- باب العسل -->
+        <stop busStop="5807318588" duration="20" until="202.0"/> <!-- باب الخضراء -->
+        <stop busStop="616142063" duration="20" until="284.0"/> <!-- ساحة الجمهورية -->
+        <stop busStop="1094476493" duration="20" until="355.0"/> <!-- ابن رشيق -->
+        <stop busStop="1094910475" duration="20" until="424.0"/> <!-- ساحة برشلونة -->
+    </route>
+    <route id="pt_light_rail_6:0" edges="94352002#0 94352002#1 687746328 94161148#1 94160876 93164197#0 93164197#2 93164197#3 94248376#0 94248376#1 94248376#2 94248376#3 94248376#4 94248376#5 613871663 613871672#0 93164249#0 1352666188 93164971#2" >
+        <stop busStop="1094511110" duration="20" until="79.0"/> <!-- ساحة برشلونة -->
+        <stop busStop="1094476124" duration="20" until="148.0"/> <!-- فرحات حشاد -->
+        <stop busStop="1080016835" duration="20" until="223.0"/> <!-- تونس البحرية -->
+    </route>
+    <route id="pt_light_rail_6:1" edges="-756034110 613857632 613871673#0 613871673#1 613871673#2 613871673#3 613871673#4 613871673#5 613871673#6 613871673#7 613871673#8 613871673#9 613871673#10 686514116#0 686514116#1 687746329#0 687746329#1 613871675#1 613871675#2" >
+        <stop busStop="-1080014547" duration="20" until="31.0"/> <!-- تونس البحرية -->
+        <stop busStop="5807445626" duration="20" until="110.0"/> <!-- فرحات حشاد -->
+        <stop busStop="5807445642" duration="20" until="188.0"/> <!-- ساحة برشلونة -->
+    </route>
+    <route id="pt_light_rail_تونس_-_حلق_الوادي_-_المرسى:0" edges="756027830#0 756027830#1 903665553 1125463856#1 1125463856#2 1125463856#3 93264447" >
+        <stop busStop="1146894481" duration="20" until="31.0"/> <!-- تونس البحرية -->
+    </route>
+    <route id="pt_light_rail_خط_تونس-حلق_الوادي-المرسى:0" edges="93265054 1125463857#0 1125463857#1 1125463857#2 903665554 93164171#1 93164171#2" >
+        <stop busStop="283636759" duration="20" until="143.0"/> <!-- تونس البحرية -->
+    </route>
+    <route id="pt_train_E:0" edges="1223326590#0" >
+        <stop busStop="10767225141" duration="20" until="55.0"/> <!-- تونس -->
+    </route>
+    <route id="pt_train_E:1" edges="25057283#0" >
+        <stop busStop="10767225142" duration="20" until="55.0"/> <!-- تونس -->
+    </route>
+    <route id="pt_train_خط_الضاحية_الجنوبية_لتونس:0" edges="103510260#1 104206508 -25057272 25057272 25057279#5 103510260#1" >
+        <stop busStop="2008352612" duration="20" until="243.0"/> <!-- مقرين الرياض -->
+        <stop busStop="2008351993" duration="20" until="666.0"/> <!-- مقرين -->
+        <stop busStop="2008351987" duration="20" until="1177.0" jump="0.10558064438155046"/> <!-- مقرين -->
+    </route>
+    <flow id="pt_light_rail_تونس_-_حلق_الوادي_-_المرسى:0" type="pt_light_rail" route="pt_light_rail_تونس_-_حلق_الوادي_-_المرسى:0" begin="3.0" end="3603.0" period="600" line="تونس_-_حلق_الوادي_-_المرسى:0" >
+        <param key="name" value="تونس - حلق الوادي - المرسى"/>
+        <param key="completeness" value="0.06"/>
+    </flow>
+    <flow id="pt_bus_12:0" type="pt_bus" route="pt_bus_12:0" begin="253.0" end="3853.0" period="600" line="12:0" >
+        <param key="name" value="Bus 12 : Jardin Thameur --&gt; Terminus Zayatine"/>
+        <param key="completeness" value="0.10"/>
+    </flow>
+    <flow id="pt_bus_12:1" type="pt_bus" route="pt_bus_12:1" begin="303.0" end="3903.0" period="600" line="12:1" >
+        <param key="name" value="Bus 12 : Terminus Zayatine --&gt; Jardin Thameur"/>
+        <param key="completeness" value="0.10"/>
+    </flow>
+    <flow id="pt_bus_12:2" type="pt_bus" route="pt_bus_12:2" begin="339.0" end="3939.0" period="600" line="12:2" >
+        <param key="name" value="Bus 12 : Jardin Thameur --&gt; Terminus Zayatine"/>
+        <param key="completeness" value="0.10"/>
+    </flow>
+    <flow id="pt_bus_20:0" type="pt_bus" route="pt_bus_20:0" begin="353.0" end="3953.0" period="600" line="20:0" >
+        <param key="completeness" value="0.33"/>
+    </flow>
+    <flow id="pt_bus_63:0" type="pt_bus" route="pt_bus_63:0" begin="383.0" end="3983.0" period="600" line="63:0" >
+        <param key="completeness" value="0.43"/>
+    </flow>
+    <flow id="pt_train_خط_الضاحية_الجنوبية_لتونس:0" type="pt_train" route="pt_train_خط_الضاحية_الجنوبية_لتونس:0" begin="389.0" end="3989.0" period="600" line="خط_الضاحية_الجنوبية_لتونس:0" >
+        <param key="name" value="تونس - برج السدرية، الرياض"/>
+        <param key="completeness" value="0.08"/>
+    </flow>
+    <flow id="pt_light_rail_4:1" type="pt_light_rail" route="pt_light_rail_4:1" begin="1367.0" end="4967.0" period="600" line="4:1" >
+        <param key="name" value="خط 4 - خير الدين-تونس البحرية"/>
+        <param key="completeness" value="0.36"/>
+    </flow>
+    <flow id="pt_light_rail_5:1" type="pt_light_rail" route="pt_light_rail_5:1" begin="928.0" end="4528.0" period="600" line="5:1" >
+        <param key="name" value="خط 5 - الانطلاقة-ساحة برشلونة"/>
+        <param key="completeness" value="0.40"/>
+    </flow>
+    <flow id="pt_light_rail_3:1" type="pt_light_rail" route="pt_light_rail_3:1" begin="1952.0" end="5552.0" period="600" line="3:1" >
+        <param key="name" value="خط 3 - ابن خلدون-ساحة برشلونة"/>
+        <param key="completeness" value="0.50"/>
+    </flow>
+    <flow id="pt_light_rail_1:1" type="pt_light_rail" route="pt_light_rail_1:1" begin="483.0" end="4083.0" period="600" line="1:1" >
+        <param key="name" value="خط 1: ساحة برشلونة - بن عروس"/>
+        <param key="completeness" value="0.09"/>
+    </flow>
+    <flow id="pt_light_rail_1:0" type="pt_light_rail" route="pt_light_rail_1:0" begin="15.0" end="3615.0" period="600" line="1:0" >
+        <param key="name" value="خط 1: بن عروس - ساحة برشلونة"/>
+        <param key="completeness" value="0.09"/>
+    </flow>
+    <flow id="pt_light_rail_2:1" type="pt_light_rail" route="pt_light_rail_2:1" begin="485.0" end="4085.0" period="600" line="2:1" >
+        <param key="name" value="خط 2 - ساحة الجمهورية =&gt; أريانة"/>
+        <param key="completeness" value="0.17"/>
+    </flow>
+    <flow id="pt_light_rail_6:1" type="pt_light_rail" route="pt_light_rail_6:1" begin="1519.0" end="5119.0" period="600" line="6:1" >
+        <param key="name" value="خط 6 - المروج 4-تونس البحرية"/>
+        <param key="completeness" value="0.17"/>
+    </flow>
+    <flow id="pt_light_rail_2:0" type="pt_light_rail" route="pt_light_rail_2:0" begin="15.0" end="3615.0" period="600" line="2:0" >
+        <param key="name" value="خط 2 - أريانة =&gt; ساحة الجمهورية"/>
+        <param key="completeness" value="0.17"/>
+    </flow>
+    <flow id="pt_light_rail_3:0" type="pt_light_rail" route="pt_light_rail_3:0" begin="17.0" end="3617.0" period="600" line="3:0" >
+        <param key="name" value="خط 3 - ابن خلدون-ساحة برشلونة"/>
+        <param key="completeness" value="0.50"/>
+    </flow>
+    <flow id="pt_light_rail_4:0" type="pt_light_rail" route="pt_light_rail_4:0" begin="400.0" end="4000.0" period="600" line="4:0" >
+        <param key="name" value="خط 4 - خير الدين-تونس البحرية"/>
+        <param key="completeness" value="0.33"/>
+    </flow>
+    <flow id="pt_light_rail_5:0" type="pt_light_rail" route="pt_light_rail_5:0" begin="702.0" end="4302.0" period="600" line="5:0" >
+        <param key="name" value="خط 5 - الانطلاقة-ساحة برشلونة"/>
+        <param key="completeness" value="0.40"/>
+    </flow>
+    <flow id="pt_light_rail_6:0" type="pt_light_rail" route="pt_light_rail_6:0" begin="131.0" end="3731.0" period="600" line="6:0" >
+        <param key="name" value="خط ٦ - المروج ٤-تونس البحرية"/>
+        <param key="completeness" value="0.17"/>
+    </flow>
+    <flow id="pt_light_rail_خط_تونس-حلق_الوادي-المرسى:0" type="pt_light_rail" route="pt_light_rail_خط_تونس-حلق_الوادي-المرسى:0" begin="132.0" end="3732.0" period="600" line="خط_تونس-حلق_الوادي-المرسى:0" >
+        <param key="name" value="خط تونس-حلق الوادي-المرسى"/>
+        <param key="completeness" value="0.06"/>
+    </flow>
+    <flow id="pt_train_E:0" type="pt_train" route="pt_train_E:0" begin="133.0" end="3733.0" period="600" line="E:0" >
+        <param key="name" value="خط E : بوقطفة-سيدي حسين - تونس"/>
+        <param key="completeness" value="0.14"/>
+    </flow>
+    <flow id="pt_train_E:1" type="pt_train" route="pt_train_E:1" begin="165.0" end="3765.0" period="600" line="E:1" >
+        <param key="name" value="خط E : تونس - بوقطفة-سيدي حسين"/>
+        <param key="completeness" value="0.14"/>
+    </flow>
+</routes>

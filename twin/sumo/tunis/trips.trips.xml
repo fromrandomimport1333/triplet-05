@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2026-11-06 14:41:17.615898 by Eclipse SUMO $Id: ptlines2flows.py v1_3_1+0313-ccb31df3eb jakob.erdmann@dlr.de 2019-09-02 13:26:32 +0200 $ v1_28_0+0000-daf91b55789
+<configuration>
+    <net-file value="C:\Users\AZIZ\Desktop\tsyp\2026-11-06-14-41-01\osm.net.xml.gz"/>
+    <ptlines-file value="C:\Users\AZIZ\Desktop\tsyp\2026-11-06-14-41-01\osm_ptlines.xml"/>
+    <ptstops-file value="C:\Users\AZIZ\Desktop\tsyp\2026-11-06-14-41-01\osm_stops.add.xml"/>
+    <output-file value="C:\Users\AZIZ\Desktop\tsyp\2026-11-06-14-41-01\osm_pt.rou.xml"/>
+    <stopinfos-file value="C:\Users\AZIZ\Desktop\tsyp\2026-11-06-14-41-01\stopinfos.xml"/>
+    <routes-file value="C:\Users\AZIZ\Desktop\tsyp\2026-11-06-14-41-01\vehroutes.xml"/>
+    <trips-file value="C:\Users\AZIZ\Desktop\tsyp\2026-11-06-14-41-01\trips.trips.xml"/>
+    <min-stops value="0"/>
+    <extend-to-fringe value="True"/>
+    <random-begin value="True"/>
+    <seed value="42"/>
+    <ignore-errors value="True"/>
+    <types value="bus,tram,subway,light_rail,train,trolleybus,monorail,minibus,share_taxi,ferry,aerialway"/>
+    <vtype-prefix value="pt_"/>
+    <verbose value="True"/>
+</configuration>
+-->
+
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+    <vType id="pt_bus" vClass="bus" speedFactor="0.95"/>
+    <vType id="pt_tram" vClass="tram" speedFactor="1.0"/>
+    <vType id="pt_train" vClass="rail"/>
+    <vType id="pt_subway" vClass="subway"/>
+    <vType id="pt_light_rail" vClass="rail_urban"/>
+    <vType id="pt_monorail" vClass="rail_urban"/>
+    <vType id="pt_trolleybus" vClass="bus" speedFactor="0.95"/>
+    <vType id="pt_minibus" vClass="bus" speedFactor="0.95"/>
+    <vType id="pt_share_taxi" vClass="taxi" speedFactor="0.95"/>
+    <vType id="pt_aerialway" vClass="cable_car" length="2.5" width="2" personCapacity="4"/>
+    <vType id="pt_ferry" vClass="ship"/>
+    <trip id="0_light_rail_تونس_-_حلق_الوادي_-_المرسى:0" type="pt_light_rail" depart="3.0" departLane="best" from="756027830#0" to="93264447">
+        <stop busStop="1146894481" duration="30"/>  <!-- تونس البحرية -->
+    </trip>
+    <trip id="1_light_rail_1:0" type="pt_light_rail" depart="15.0" departLane="best" from="94352002#0" to="687746328">
+        <stop busStop="1094511110" duration="30"/>  <!-- ساحة برشلونة -->
+    </trip>
+    <trip id="2_light_rail_2:0" type="pt_light_rail" depart="15.0" departLane="best" from="686935564#0" to="94210236#2">
+        <stop busStop="1094907123" duration="30"/>  <!-- نيلسون مانديلا -->
+        <stop busStop="1094892860" duration="30"/>  <!-- ساحة الجمهورية -->
+    </trip>
+    <trip id="3_light_rail_3:0" type="pt_light_rail" depart="17.0" departLane="best" from="94237727#0" to="94165476#2">
+        <stop busStop="5807318625" duration="30"/>  <!-- باب سعدون -->
+        <stop busStop="5807318593" duration="30"/>  <!-- باب العسل -->
+        <stop busStop="5807318588" duration="30"/>  <!-- باب الخضراء -->
+        <stop busStop="616142063" duration="30"/>  <!-- ساحة الجمهورية -->
+        <stop busStop="1094476493" duration="30"/>  <!-- ابن رشيق -->
+        <stop busStop="1094910475" duration="30"/>  <!-- ساحة برشلونة -->
+    </trip>
+    <trip id="4_light_rail_4:0" type="pt_light_rail" depart="52.0" departLane="best" from="94237727#0" to="93164971#2">
+        <stop busStop="5807318625" duration="30"/>  <!-- باب سعدون -->
+        <stop busStop="1095146798" duration="30"/>  <!-- باب العسل -->
+        <stop busStop="5807318588" duration="30"/>  <!-- باب الخضراء -->
+        <stop busStop="616142063" duration="30"/>  <!-- ساحة الجمهورية -->
+        <stop busStop="1094476493" duration="30"/>  <!-- ابن رشيق -->
+        <stop busStop="1094476124" duration="30"/>  <!-- فرحات حشاد -->
+        <stop busStop="1080016835" duration="30"/>  <!-- تونس البحرية -->
+    </trip>
+    <trip id="5_light_rail_5:0" type="pt_light_rail" depart="119.0" departLane="best" from="613857627" to="94237734#6">
+        <stop busStop="1094483039" duration="30"/>  <!-- ساحة برشلونة -->
+        <stop busStop="1095145955" duration="30"/>  <!-- حبيب ثامر -->
+        <stop busStop="318594461" duration="30"/>  <!-- ساحة الجمهورية -->
+        <stop busStop="1095144771" duration="30"/>  <!-- باب الخضراء -->
+        <stop busStop="1095146798@1368402" duration="30"/>  <!-- باب العسل -->
+        <stop busStop="1095145544" duration="30"/>  <!-- باب سعدون -->
+    </trip>
+    <trip id="6_light_rail_6:0" type="pt_light_rail" depart="131.0" departLane="best" from="94352002#0" to="93164971#2">
+        <stop busStop="1094511110" duration="30"/>  <!-- ساحة برشلونة -->
+        <stop busStop="1094476124" duration="30"/>  <!-- فرحات حشاد -->
+        <stop busStop="1080016835" duration="30"/>  <!-- تونس البحرية -->
+    </trip>
+    <trip id="7_light_rail_خط_تونس-حلق_الوادي-المرسى:0" type="pt_light_rail" depart="132.0" departLane="best" from="93265054" to="93164171#2">
+        <stop busStop="283636759" duration="30"/>  <!-- تونس البحرية -->
+    </trip>
+    <trip id="8_train_E:0" type="pt_train" depart="133.0" departLane="best" from="1223326590#0" to="1223326590#0">
+        <stop busStop="10767225141" duration="30"/>  <!-- تونس -->
+    </trip>
+    <trip id="9_train_E:1" type="pt_train" depart="165.0" departLane="best" from="25057283#0" to="25057283#0">
+        <stop busStop="10767225142" duration="30"/>  <!-- تونس -->
+    </trip>
+    <trip id="10_bus_12:0" type="pt_bus" depart="253.0" departLane="best" from="56681325#0" to="56681325#3">
+        <stop busStop="1103531608" duration="30"/>  <!-- None -->
+    </trip>
+    <trip id="11_bus_12:1" type="pt_bus" depart="303.0" departLane="best" from="56681325#0" to="56681325#0">
+        <stop busStop="1103531608" duration="30"/>  <!-- None -->
+    </trip>
+    <trip id="12_bus_12:2" type="pt_bus" depart="326.0" departLane="best" from="56681325#0" to="56681325#3">
+        <stop busStop="1103531608" duration="30"/>  <!-- None -->
+    </trip>
+    <trip id="13_bus_20:0" type="pt_bus" depart="353.0" departLane="best" from="19800017" to="19800017">
+        <stop busStop="1183577041" duration="30"/>  <!-- None -->
+    </trip>
+    <trip id="14_bus_63:0" type="pt_bus" depart="383.0" departLane="best" from="56681325#0" to="94210253#3">
+        <stop busStop="1103531608" duration="30"/>  <!-- None -->
+        <stop busStop="387151797" duration="30"/>  <!-- None -->
+        <stop busStop="2517195465" duration="30"/>  <!-- جامع الفتح -->
+    </trip>
+    <trip id="15_train_خط_الضاحية_الجنوبية_لتونس:0" type="pt_train" depart="389.0" departLane="best" from="103510260#1" to="103510260#1">
+        <stop busStop="2008352612" duration="30"/>  <!-- مقرين الرياض -->
+        <stop busStop="2008351993" duration="30"/>  <!-- مقرين -->
+        <stop busStop="2008351987" duration="30"/>  <!-- مقرين -->
+    </trip>
+    <trip id="16_light_rail_4:1" type="pt_light_rail" depart="406.0" departLane="best" from="-756034110" to="94237734#6">
+        <stop busStop="-1080014547" duration="30"/>  <!-- تونس البحرية -->
+        <stop busStop="5807445626" duration="30"/>  <!-- فرحات حشاد -->
+        <stop busStop="1094510272" duration="30"/>  <!-- ساحة برشلونة -->
+        <stop busStop="1095145955" duration="30"/>  <!-- حبيب ثامر -->
+        <stop busStop="318594461" duration="30"/>  <!-- ساحة الجمهورية -->
+        <stop busStop="1095144771" duration="30"/>  <!-- باب الخضراء -->
+        <stop busStop="1095146798@1368402" duration="30"/>  <!-- باب العسل -->
+        <stop busStop="1095145544" duration="30"/>  <!-- باب سعدون -->
+    </trip>
+    <trip id="17_light_rail_5:1" type="pt_light_rail" depart="418.0" departLane="best" from="94237727#0" to="94165476#2">
+        <stop busStop="5807318625" duration="30"/>  <!-- باب سعدون -->
+        <stop busStop="5807318593" duration="30"/>  <!-- باب العسل -->
+        <stop busStop="5807318588" duration="30"/>  <!-- باب الخضراء -->
+        <stop busStop="616142063" duration="30"/>  <!-- ساحة الجمهورية -->
+        <stop busStop="1094476493" duration="30"/>  <!-- ابن رشيق -->
+        <stop busStop="1094910475" duration="30"/>  <!-- ساحة برشلونة -->
+    </trip>
+    <trip id="18_light_rail_3:1" type="pt_light_rail" depart="441.0" departLane="best" from="613857627" to="94237734#6">
+        <stop busStop="1094483039" duration="30"/>  <!-- ساحة برشلونة -->
+        <stop busStop="1095145955" duration="30"/>  <!-- حبيب ثامر -->
+        <stop busStop="318594461" duration="30"/>  <!-- ساحة الجمهورية -->
+        <stop busStop="1095144771" duration="30"/>  <!-- باب الخضراء -->
+        <stop busStop="1095146798@1368402" duration="30"/>  <!-- باب العسل -->
+        <stop busStop="1095145544" duration="30"/>  <!-- باب سعدون -->
+    </trip>
+    <trip id="19_light_rail_1:1" type="pt_light_rail" depart="483.0" departLane="best" from="687746329#1" to="687746329#1">
+        <stop busStop="5807445642" duration="30"/>  <!-- ساحة برشلونة -->
+    </trip>
+    <trip id="20_light_rail_2:1" type="pt_light_rail" depart="485.0" departLane="best" from="687681278" to="94210247#4">
+        <stop busStop="1094910245" duration="30"/>  <!-- ساحة الجمهورية -->
+        <stop busStop="5807318037" duration="30"/>  <!-- نيلسون مانديلا -->
+    </trip>
+    <trip id="21_light_rail_6:1" type="pt_light_rail" depart="535.0" departLane="best" from="-756034110" to="613871675#2">
+        <stop busStop="-1080014547" duration="30"/>  <!-- تونس البحرية -->
+        <stop busStop="5807445626" duration="30"/>  <!-- فرحات حشاد -->
+        <stop busStop="5807445642" duration="30"/>  <!-- ساحة برشلونة -->
+    </trip>
+</routes>

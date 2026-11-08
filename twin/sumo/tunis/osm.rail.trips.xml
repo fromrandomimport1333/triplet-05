@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2026-11-06 14:41:42.873411 by Eclipse SUMO osmWebWizard.py v1_28_0+0000-daf91b55789
+<configuration>
+    <net-file value="C:\Users\AZIZ\Desktop\tsyp\2026-11-06-14-41-01\osm.net.xml.gz"/>
+    <output-trip-file value="C:\Users\AZIZ\Desktop\tsyp\2026-11-06-14-41-01\osm.rail.trips.xml"/>
+    <route-file value="C:\Users\AZIZ\Desktop\tsyp\2026-11-06-14-41-01\osm.rail.rou.xml"/>
+    <prefix value="rail"/>
+    <trip-attributes value="departLane=&quot;best&quot;"/>
+    <fringe-start-attributes value="departSpeed=&quot;max&quot;"/>
+    <vehicle-class value="rail"/>
+    <fringe-factor value="40"/>
+    <edge-permission value="rail"/>
+    <via-edge-types value="highway.motorway,highway.motorway_link,highway.trunk_link,highway.primary_link,highway.secondary_link,highway.tertiary_link"/>
+    <seed value="46"/>
+    <min-distance value="2400.0"/>
+    <min-distance.fringe value="10.0"/>
+    <remove-loops value="True"/>
+    <insertion-density value="2.0"/>
+</configuration>
+-->
+
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+    <vType id="rail_rail" vClass="rail"/>
+    <trip id="rail0" depart="0.00" from="104206508" to="-25057272" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail1" depart="38.74" from="25057272" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail2" depart="77.49" from="103510260#0" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail3" depart="116.23" from="104206508" to="-25057272" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail4" depart="154.97" from="104206504#0" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail5" depart="193.72" from="104206474" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail6" depart="232.46" from="104206508" to="-25057272" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail7" depart="271.20" from="104206519" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail8" depart="309.94" from="104206504#0" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail9" depart="348.69" from="25057272" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail10" depart="387.43" from="25057273" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail11" depart="426.17" from="103510260#0" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail12" depart="464.92" from="25057272" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail13" depart="503.66" from="104206508" to="-25057272" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail14" depart="542.40" from="104206519" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail15" depart="581.15" from="25057279#0" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail16" depart="619.89" from="25057273" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail17" depart="658.63" from="104206504#0" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail18" depart="697.37" from="25057277" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail19" depart="736.12" from="25057277" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail20" depart="774.86" from="25057279#0" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail21" depart="813.60" from="104206508" to="-25057272" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail22" depart="852.35" from="104206474" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail23" depart="891.09" from="104206508" to="-25057272" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail24" depart="929.83" from="104206519" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail25" depart="968.58" from="104206519" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail26" depart="1007.32" from="25057279#0" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail27" depart="1046.06" from="25057279#0" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail28" depart="1084.81" from="104206519" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail29" depart="1123.55" from="25057279#0" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail30" depart="1162.29" from="25057273" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail31" depart="1201.03" from="25057279#0" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail32" depart="1239.78" from="25057272" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail33" depart="1278.52" from="25057272" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail34" depart="1317.26" from="104206519" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail35" depart="1356.01" from="25057279#3" to="103510260#1" departLane="best" type="rail_rail"/>
+    <trip id="rail36" depart="1394.75" from="104206504#0" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail37" depart="1433.49" from="25057273" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail38" depart="1472.24" from="103510260#0" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail39" depart="1510.98" from="104206474" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail40" depart="1549.72" from="104206508" to="-25057272" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail41" depart="1588.47" from="104206519" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail42" depart="1627.21" from="25057279#0" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail43" depart="1665.95" from="103510260#0" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail44" depart="1704.69" from="104206519" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail45" depart="1743.44" from="25057273" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail46" depart="1782.18" from="104206508" to="-25057272" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail47" depart="1820.92" from="25057272" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail48" depart="1859.67" from="104206474" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail49" depart="1898.41" from="103510260#0" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail50" depart="1937.15" from="25057277" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail51" depart="1975.90" from="104206474" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail52" depart="2014.64" from="103510260#0" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail53" depart="2053.38" from="25057279#0" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail54" depart="2092.12" from="104206474" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail55" depart="2130.87" from="104206508" to="-25057272" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail56" depart="2169.61" from="104206504#0" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail57" depart="2208.35" from="104206508" to="-25057272" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail58" depart="2247.10" from="103510260#0" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail59" depart="2285.84" from="104206474" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail60" depart="2324.58" from="25057279#0" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail61" depart="2363.33" from="104206504#0" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail62" depart="2402.07" from="104206508" to="-25057272" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail63" depart="2440.81" from="25057277" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail64" depart="2479.56" from="104206508" to="-25057272" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail65" depart="2518.30" from="25057277" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail66" depart="2557.04" from="104206508" to="-25057272" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail67" depart="2595.78" from="104206504#0" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail68" depart="2634.53" from="103510260#0" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail69" depart="2673.27" from="25057273" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail70" depart="2712.01" from="104206519" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail71" depart="2750.76" from="25057277" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail72" depart="2789.50" from="104206508" to="25057279#5" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail73" depart="2828.24" from="103510260#0" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail74" depart="2866.99" from="25057279#0" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail75" depart="2905.73" from="104206474" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail76" depart="2944.47" from="104206474" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail77" depart="2983.22" from="25057277" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail78" depart="3021.96" from="104206508" to="-25057272" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail79" depart="3060.70" from="104206474" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail80" depart="3099.44" from="25057277" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail81" depart="3138.19" from="25057273" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail82" depart="3176.93" from="25057273" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail83" depart="3215.67" from="104206504#0" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail84" depart="3254.42" from="104206508" to="-25057272" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail85" depart="3293.16" from="25057273" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail86" depart="3331.90" from="25057272" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail87" depart="3370.65" from="104206474" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail88" depart="3409.39" from="104206474" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail89" depart="3448.13" from="25057273" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail90" depart="3486.87" from="104206519" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail91" depart="3525.62" from="104206508" to="-25057272" departLane="best" type="rail_rail" departSpeed="max"/>
+    <trip id="rail92" depart="3564.36" from="25057273" to="103510260#1" departLane="best" type="rail_rail" departSpeed="max"/>
+</routes>

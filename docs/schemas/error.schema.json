@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tsyp14.local/schemas/error.schema.json",
+  "title": "Error (any layer; REST error replies)",
+  "description": "",
+  "type": "object",
+  "properties": {
+    "contract_version": {
+      "type": "string",
+      "pattern": "^1\\.[0-9]+$",
+      "description": "Contract version; this repository speaks 1.x"
+    },
+    "type": {
+      "const": "error"
+    },
+    "code": {
+      "enum": [
+        "SCHEMA_INVALID",
+        "BAD_ARGS",
+        "UNAUTHORIZED",
+        "FORBIDDEN",
+        "NOT_FOUND",
+        "UNAVAILABLE",
+        "INTERNAL"
+      ]
+    },
+    "detail": {
+      "type": "string"
+    },
+    "errors": {
+      "type": "array"
+    },
+    "ts": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z$",
+      "description": "UTC ISO-8601"
+    }
+  },
+  "required": [
+    "contract_version",
+    "type",
+    "code",
+    "detail"
+  ],
+  "additionalProperties": true
+}

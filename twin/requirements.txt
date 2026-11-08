@@ -1,0 +1,11 @@
+traci
+sumolib
+pyproj
+paho-mqtt
+fastapi
+uvicorn
+pyyaml
+httpx
+jsonschema   # validation of REST bodies and messages against docs/schemas/
+psutil       # scenarios: T6 stops the Guardian by its port
+pytest       # twin/tests, scenarios/tests

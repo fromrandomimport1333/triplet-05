@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tsyp14.local/schemas/verdict.schema.json",
+  "title": "Trust verdict (Guardian -> Brain, all; MQTT guardian/verdicts/<id>, REST /verify, /verdict/{id})",
+  "description": "",
+  "type": "object",
+  "properties": {
+    "contract_version": {
+      "type": "string",
+      "pattern": "^1\\.[0-9]+$",
+      "description": "Contract version; this repository speaks 1.x"
+    },
+    "type": {
+      "const": "verdict"
+    },
+    "verdict_id": {
+      "type": "string"
+    },
+    "reading_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "reading_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "sensor_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "zone_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "kind": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "reading_seq": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "status": {
+      "enum": [
+        "trusted",
+        "suspicious",
+        "untrusted"
+      ]
+    },
+    "trust": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "reasons": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "checked_by": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "scores": {
+      "type": "object"
+    },
+    "quarantined": {
+      "type": "boolean"
+    },
+    "ts": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z$",
+      "description": "UTC ISO-8601"
+    },
+    "sig": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "HMAC-SHA256 (hex) over the message without sig, keys sorted, separators (',', ':')"
+    }
+  },
+  "required": [
+    "contract_version",
+    "type",
+    "status",
+    "trust",
+    "reasons",
+    "ts"
+  ],
+  "additionalProperties": true
+}

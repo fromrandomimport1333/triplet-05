@@ -1,0 +1,76 @@
+# Settings for the Twin team's Guardian and Brain STAND-INS. The broker address and the shared signing key come from
+# ../city.yaml. Environment variables override this file (see .env.example): TWIN_URL, GUARDIAN_URL, GUARDIAN_API_KEY,
+# BRAIN_GUARDIAN_KEY, TWIN_API_KEY, TWIN_GUARDIAN_KEY, GUARDIAN_PORT, BRAIN_PORT, MQTT_HOST, MQTT_PORT, TSYP_HMAC_KEY.
+# DEVELOPMENT KEYS ONLY.
+
+twin:
+  api_url: http://127.0.0.1:8000          # the Twin's REST API (127.0.0.1, not localhost: about 2 s faster per call on Windows)
+
+guardian:
+  host: 0.0.0.0
+  port: 8001                              # the Brain asks http://127.0.0.1:8001/verify
+  api_key: guardian-key                   # clients send it as header X-API-Key
+  twin_key: guardian-twin-key             # the Twin's api.guardian_key: the only key allowed to quarantine
+  max_age_s: 5                            # |now - ts| above this is rejected (Phase 0 report: +-5 s)
+  max_rate_per_s: 3                       # more messages than this per second from one sensor = network flooding
+  dropout_after_s: 5                      # no reading for this long = sensor treated as untrusted
+  stuck_after: 10                         # identical values in a row before "stuck"
+  sustained_change_after: 20              # readings that must agree before a big jump is accepted as real
+  window_s: 5                             # verdicts are grouped in windows of this length
+  quarantine_after_windows: 3             # 3 untrusted windows in a row -> Twin quarantine_device
+  release_after_clean_windows: 3          # 3 clean windows in a row -> release
+  auto_quarantine: true
+  max_flagged_fraction: 0.3               # "watching the watcher": above this share, alert the operator, do not quarantine
+
+brain:
+  host: 0.0.0.0
+  port: 8003                              # the stand-in's small REST API: decisions, operator requests
+  guardian_url: http://127.0.0.1:8001
+  guardian_key: guardian-key
+  twin_key: change-me                     # the Twin's api_key (the Brain key): the only key allowed to command actuators
+  # Rules. The real Brain uses the Phase 0 report's Table 4 (water > 3.5 m for 30 s, jam for 2 min, ...); the stand-in
+  # uses lower values so a demo takes minutes, not hours.
+  flood_threshold_m: 1.0                  # water level that counts as flooding
+  clear_threshold_m: 0.7                  # level below which the flood is over
+  confirm_readings: 3                     # consecutive readings above the threshold before acting
+  clear_readings: 5
+  jam_speed_kmh: 10                       # a camera is "jammed" below this mean speed ...
+  jam_density_pct: 80                     # ... and above this density
+  jam_share: 0.5                          # share of a zone's cameras that must be jammed
+  jam_sustain_s: 30                       # for this long (Table 4: 2 min)
+  jam_clear_s: 20
+  jam_signal_phase: 2                     # signal phase given to the zone's traffic light during a jam
+  retry_blocked_after_s: 10               # how often a blocked decision is re-checked
+  hold_s: 5                               # tier B "suspicious": hold this long, then ask the Guardian once more
+  feedback_timeout_s: 10                  # no confirming feedback in this time = the action failed, try the next one
+  tiers:                                  # Phase 0 report, Table 5
+    water_valve: B
+    road_closure: B
+    traffic_signal: B
+    power_grid: B
+    public_alert: A
+    emergency_dispatch: A
+  log_dir: ../../logs                     # relative to this file: the triplet's root logs/ folder (R2)
+
+# Stand-ins for the REAL City Brain protocol (partner_mock.py): MQTT over TLS, signed envelopes. Used with the Twin's
+# `integration:` profile on, to demonstrate the Twin alone. Paths are relative to this file; the key files are the
+# Brain team's (never in git). Environment overrides: see partner_mock.py.
+wire:
+  mqtt:
+    host: 127.0.0.1
+    port: 8883
+    tls: true
+    ca_cert: ../../secrets/ca.crt
+    username: {guardian: guardian, brain: brain}
+    password_file: {guardian: ../../secrets/guardian-password.txt, brain: ../../secrets/broker-password.txt}
+  keys:
+    twin_brain: ../../secrets/keys/twin-brain.key
+    twin_guardian: ../../secrets/keys/twin-guardian.key       # the key the Twin and the Guardian agree on
+    guardian_brain: ../../secrets/keys/guardian-brain.key
+  guardian:
+    refresh_s: 20             # re-send current verdicts when silent this long (the Brain's limit is 30 s)
+    frozen_after: 8           # identical readings in a row = suspicious
+    max_jump_frac: 0.25       # a step larger than this share of the sensor's min..max range is implausible
+    quarantine_after: 3       # consecutive rejected readings
+  brain:
+    confirm_readings: 3
