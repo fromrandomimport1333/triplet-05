@@ -2,3 +2,8 @@
 /twin/      @twin-team
 /brain/     @brain-team
 /guardian/  @guardian-team
+
+# Shared parts: all three teams
+/scenarios/   @twin-team @brain-team @guardian-team
+/timeline/    @twin-team @brain-team @guardian-team
+/docs/        @twin-team @brain-team @guardian-team

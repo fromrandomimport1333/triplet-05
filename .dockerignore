@@ -1,0 +1,16 @@
+.git
+.venv
+venv
+**/__pycache__
+.pytest_cache
+.env
+*.zip
+logs
+twin/logs
+twin/old
+twin/sumo
+routes.rou.xml
+docs/phase0
+*.db
+twin_events*
+emergency_calls*

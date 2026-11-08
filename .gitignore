@@ -237,3 +237,23 @@ brain/logs/*
 
 # Intermediate file of docs/report/build_report.py
 docs/report/_report.html
+
+# Twin layer: runtime data, local secrets, SUMO outputs
+twin/logs/
+twin/old/
+*.db
+*.db-journal
+twin_events*
+emergency_calls*
+logs/services/
+tripinfos.xml
+stopinfos.xml
+edgeData.xml
+stats.xml
+vehroutes.xml
+routes.rou.xml
+*.errorlog
+twin/sumo/**/output/
+secrets/
+*.key
+ca.crt

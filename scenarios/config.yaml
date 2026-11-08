@@ -1,0 +1,27 @@
+# Scenario settings. Choose the layers with  --layers mocks  (default: the Twin team's stand-ins) or  --layers real
+# (the partner teams' Brain and Guardian). Environment variables override the chosen profile: TWIN_URL, GUARDIAN_URL,
+# BRAIN_URL, GUARDIAN_API_KEY, TWIN_TEST_KEY, MQTT_HOST, MQTT_PORT, TSYP_HMAC_KEY.
+# Broker, signing key and the Twin's test key default to ../twin/city.yaml.
+
+default_layers: mocks
+
+profiles:
+  mocks:
+    twin_url: http://127.0.0.1:8000
+    guardian_url: http://127.0.0.1:8001
+    brain_url: http://127.0.0.1:8003       # stand-in operator API (approve requests in degraded mode)
+    guardian_key: guardian-key
+    flood_threshold_m: 1.0                 # level the Brain acts on (used to time "incident -> action")
+    jam_sustain_s: 30
+    # How scenario T6 kills and restarts the Guardian. "port" = stop whatever listens on the Guardian's port.
+    guardian_kill: port
+    guardian_start: ["{python}", "twin/mocks/guardian_mock.py"]   # run from the repository root
+  real:
+    twin_url: http://127.0.0.1:8000
+    guardian_url: http://127.0.0.1:8001    # set GUARDIAN_URL to the Guardian team's address
+    brain_url: http://127.0.0.1:8003       # set BRAIN_URL to the Brain team's address (optional)
+    guardian_key: guardian-key             # set GUARDIAN_API_KEY
+    flood_threshold_m: 3.5                 # Phase 0 report, Table 4
+    jam_sustain_s: 120
+    guardian_kill: port                    # or a command list, e.g. ["docker", "compose", "stop", "guardian"]
+    guardian_start: null                   # e.g. ["docker", "compose", "start", "guardian"]; null = restart it by hand

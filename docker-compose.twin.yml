@@ -1,0 +1,122 @@
+# One-command start with Docker:   docker compose up --build        then open http://127.0.0.1:8002
+#
+#   mosquitto  MQTT broker (port 1883)
+#   twin       the Twin, --fake mode (no SUMO in the image), REST on port 8000
+#   guardian   the Twin team's Guardian STAND-IN, port 8001     } swap for the partner teams' layers:
+#   brain      the Twin team's Brain STAND-IN, port 8003        } see "Using a partner layer" below
+#   timeline   live timeline screen, port 8002
+#
+# Run a scenario from the host (venv active, broker and Twin are published on 127.0.0.1):
+#   python scenarios\run_scenario.py t3
+# or inside the stack:
+#   docker compose run --rm scenarios t3
+# (T6 stops and restarts the Guardian by its port, which only works when the scenario runs next to it, on the host
+#  without Docker; inside Docker set guardian_kill / guardian_start in scenarios/config.yaml to docker compose commands.)
+#
+# Using a partner layer: start only what the Twin team owns, then start the partner's container on the same network
+# (or on the host) with the same variables:
+#   docker compose up --build mosquitto twin timeline
+# The partner layer must read MQTT_HOST/MQTT_PORT, TSYP_HMAC_KEY, TWIN_URL and its own key, exactly like our
+# stand-ins below (INTEGRATION.md, "Swapping a layer"). No code change on our side.
+#
+# Keys: the ${VAR:-default} values come from .env in this folder when it exists (copy .env.example), otherwise the
+# development defaults below, which match twin/city.yaml and twin/mocks/mocks.yaml. Host names are fixed here on
+# purpose: inside the stack the broker is "mosquitto", not 127.0.0.1.
+
+x-python: &python
+  build:
+    context: .
+    dockerfile: docker/Dockerfile
+  image: tsyp-twin-team:latest
+  restart: unless-stopped
+  volumes:
+    - ./logs:/app/logs
+
+x-common-env: &common-env
+  MQTT_HOST: mosquitto
+  MQTT_PORT: "1883"
+  MQTT_USERNAME: ${MQTT_USERNAME:-}
+  MQTT_PASSWORD: ${MQTT_PASSWORD:-}
+  TSYP_HMAC_KEY: ${TSYP_HMAC_KEY:-change-me-too}
+
+services:
+  mosquitto:
+    image: eclipse-mosquitto:2
+    ports:
+      - "1883:1883"
+    volumes:
+      - ./docker/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+    restart: unless-stopped
+
+  twin:
+    <<: *python
+    command: ["python", "twin/src/twin.py", "--fake"]
+    environment:
+      <<: *common-env
+      TWIN_API_HOST: 0.0.0.0
+      TWIN_API_PORT: "8000"
+      TWIN_API_KEY: ${TWIN_API_KEY:-change-me}
+      TWIN_GUARDIAN_KEY: ${TWIN_GUARDIAN_KEY:-guardian-twin-key}
+      TWIN_TEST_KEY: ${TWIN_TEST_KEY:-test-key}
+    ports:
+      - "8000:8000"
+    depends_on: [mosquitto]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=2)"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+
+  guardian:            # STAND-IN. Replace with the Guardian team's container (same port, same variables)
+    <<: *python
+    command: ["python", "twin/mocks/guardian_mock.py"]
+    environment:
+      <<: *common-env
+      TWIN_URL: http://twin:8000
+      GUARDIAN_PORT: "8001"
+      GUARDIAN_API_KEY: ${GUARDIAN_API_KEY:-guardian-key}
+      TWIN_GUARDIAN_KEY: ${TWIN_GUARDIAN_KEY:-guardian-twin-key}
+    ports:
+      - "8001:8001"
+    depends_on:
+      twin: {condition: service_healthy}
+
+  brain:               # STAND-IN. Replace with the Brain team's container (same variables)
+    <<: *python
+    command: ["python", "twin/mocks/brain_mock.py"]
+    environment:
+      <<: *common-env
+      TWIN_URL: http://twin:8000
+      GUARDIAN_URL: http://guardian:8001
+      BRAIN_GUARDIAN_KEY: ${BRAIN_GUARDIAN_KEY:-guardian-key}
+      TWIN_API_KEY: ${TWIN_API_KEY:-change-me}
+      BRAIN_PORT: "8003"
+    ports:
+      - "8003:8003"
+    depends_on:
+      twin: {condition: service_healthy}
+      guardian: {condition: service_started}
+
+  timeline:
+    <<: *python
+    command: ["python", "timeline/timeline.py"]
+    environment:
+      <<: *common-env
+    ports:
+      - "8002:8002"
+    depends_on: [mosquitto]
+
+  scenarios:           # not started by "up": docker compose run --rm scenarios t3
+    <<: *python
+    restart: "no"
+    profiles: ["tools"]
+    entrypoint: ["python", "scenarios/run_scenario.py"]
+    command: ["--list"]
+    environment:
+      <<: *common-env
+      TWIN_URL: http://twin:8000
+      GUARDIAN_URL: http://guardian:8001
+      BRAIN_URL: http://brain:8003
+      GUARDIAN_API_KEY: ${GUARDIAN_API_KEY:-guardian-key}
+      TWIN_TEST_KEY: ${TWIN_TEST_KEY:-test-key}
+    depends_on: [twin]

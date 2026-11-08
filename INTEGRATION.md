@@ -2,6 +2,8 @@
 
 How the three layers connect: diagram, protocol, and one scenario traced end to end.
 
+> The Twin's implemented integration profile (MQTT/TLS adapters, keys, topic map, open points) is documented in [integration/TWIN-INTEGRATION.md](integration/TWIN-INTEGRATION.md).
+
 ## Diagram
 
 ```

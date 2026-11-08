@@ -36,8 +36,27 @@ services:
 
   # The other layers of the triplet (their teams' folders; each needs its Dockerfile).
   twin:
-    build: ./twin
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    command: ["python", "twin/src/twin.py", "--fake"]
     depends_on: [broker]
+    environment:
+      INTEGRATION_ENABLED: "1"
+      PARTNER_MQTT_HOST: broker
+      PARTNER_MQTT_PORT: "8883"
+      PARTNER_MQTT_TLS: "1"
+      PARTNER_MQTT_CA_CERT: /app/secrets/ca.crt
+      PARTNER_MQTT_USERNAME: twin
+      PARTNER_MQTT_PASSWORD_FILE: /app/secrets/twin-password.txt
+      TWIN_BRAIN_KEY_FILE: /app/secrets/keys/twin-brain.key
+      TWIN_GUARDIAN_KEY_FILE: /app/secrets/keys/twin-guardian.key
+      TWIN_API_HOST: 0.0.0.0
+      TWIN_API_PORT: "8000"
+    volumes:
+      - ./brain/secrets:/app/secrets:ro
+    ports:
+      - "8000:8000"
     profiles: [real-layers]
   guardian:
     build: ./guardian

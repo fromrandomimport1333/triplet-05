@@ -3,6 +3,8 @@
 One YAML file per Test Book scenario, one command per run, one log file per run (Phase 1 rule R2).
 `TESTBOOK.md` at the repo root is generated from these files.
 
+> The Twin team's own T1-T12 runner is separate: see [README-twin.md](README-twin.md) (`python scenarios/run_scenario.py`).
+
 ```
 python scenarios/run.py B3          # run one scenario (also ./scenarios/run B3, scenarios\run.cmd B3, .\scenarios\run.ps1 B3)
 python scenarios/run.py --all       # all of them, in turn

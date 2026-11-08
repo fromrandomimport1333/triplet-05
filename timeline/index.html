@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>City timeline</title>
+<style>
+:root{--bg:#0f1720;--panel:#17212c;--text:#e6edf3;--mute:#8b98a5;--twin:#4aa3ff;--guardian:#f5b73b;--brain:#b58cff;--actuator:#3ddc97;--bad:#ff5d5d;--line:#243242}
+@media (prefers-color-scheme: light){:root{--bg:#f4f6f8;--panel:#fff;--text:#16202a;--mute:#5d6b78;--line:#dbe2e8}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px/1.4 system-ui,sans-serif}
+header{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+h1{font-size:16px;margin:0}.tiles{display:flex;gap:10px;flex-wrap:wrap;margin-left:auto}
+.tile{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:6px 10px;min-width:110px}
+.tile b{display:block;font-size:11px;color:var(--mute);font-weight:500}.tile span{font-size:18px;font-variant-numeric:tabular-nums}
+.tile.bad span{color:var(--bad)}
+.legend{padding:8px 16px;display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--mute)}
+.legend i,.tag{display:inline-block;border-radius:4px;padding:1px 7px;font-style:normal;font-size:11px;font-weight:600;color:#0b1118}
+.twin{background:var(--twin)}.guardian{background:var(--guardian)}.brain{background:var(--brain)}.actuator{background:var(--actuator)}
+label{cursor:pointer}
+main{padding:0 16px 16px}
+.row{display:grid;grid-template-columns:96px 84px 1fr;gap:10px;padding:5px 0;border-bottom:1px solid var(--line);align-items:baseline}
+.row .t{font-variant-numeric:tabular-nums;color:var(--mute)}.row.bad .x{color:var(--bad);font-weight:600}
+.row.flag .x{color:var(--guardian)}
+@media(max-width:600px){.row{grid-template-columns:76px 1fr}.row .tag{display:none}}
+</style></head><body>
+<header><h1>City timeline: reading → Guardian verdict → Brain decision → actuator</h1>
+<div class="tiles" id="tiles"></div></header>
+<div class="legend">
+<label><input type="checkbox" data-l="twin" checked> <i class="twin">TWIN</i> readings, faults</label>
+<label><input type="checkbox" data-l="guardian" checked> <i class="guardian">GUARDIAN</i> verdicts, /verify answers, alerts</label>
+<label><input type="checkbox" data-l="brain" checked> <i class="brain">BRAIN</i> decisions (gate, commands, degraded mode)</label>
+<label><input type="checkbox" data-l="actuator" checked> <i class="actuator">ACTUATOR</i> results (signal, road, valve, alert, grid, dispatch, quarantine)</label>
+<label><input type="checkbox" id="pause"> pause</label></div>
+<main id="log"></main>
+<script>
+const log=document.getElementById('log'),tiles=document.getElementById('tiles');
+const hidden=new Set(),state={};let paused=false;
+document.querySelectorAll('[data-l]').forEach(c=>c.onchange=()=>{c.checked?hidden.delete(c.dataset.l):hidden.add(c.dataset.l);
+ document.querySelectorAll('.row').forEach(r=>r.hidden=hidden.has(r.dataset.l))});
+document.getElementById('pause').onchange=e=>paused=e.target.checked;
+const fmt=ts=>ts?ts.slice(11,23):new Date().toISOString().slice(11,23);
+function tile(k,v,bad){state[k]={v,bad};tiles.innerHTML=Object.entries(state).map(([k,s])=>
+ `<div class="tile ${s.bad?'bad':''}"><b>${k}</b><span>${s.v}</span></div>`).join('')}
+function add(r,top){
+ if(r.layer==='twin'&&r.kind==='water_level'&&!r.flag)tile(r.sid,(+r.value).toFixed(2)+' m',r.value>=1);
+ if(r.layer==='actuator')tile(r.actuator,r.state,false);
+ if(r.layer==='guardian'&&r.verdict&&r.sid)tile('verdict '+r.sid,r.bad?'UNTRUSTED':'trusted',r.bad);
+ const d=document.createElement('div');d.className='row'+(r.bad?' bad':'')+(r.flag?' flag':'');d.dataset.l=r.layer;d.hidden=hidden.has(r.layer);
+ const esc=s=>String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+ d.innerHTML=`<span class="t">${fmt(r.ts)}</span><span class="tag ${r.layer}">${r.layer.toUpperCase()}</span><span class="x">${esc(r.text)}</span>`;
+ log.prepend(d);while(log.children.length>500)log.lastChild.remove();}
+fetch('/history').then(r=>r.json()).then(h=>h.forEach(add));
+const es=new EventSource('/stream');es.onmessage=e=>{if(!paused)add(JSON.parse(e.data))};
+</script></body></html>
