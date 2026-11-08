@@ -365,3 +365,28 @@ def test_core_forged_noisy_level_stays_rejected_without_rebase():
 def test_configured_guardian_does_not_rebase():
     from src.common import config
     assert config.load("guardian-mock")["checks"]["rebase_n"] == 0
+
+
+# --- pair key twin-guardian: the Twin seals readings for both layers ----------------------------------------
+
+TWIN_GUARDIAN_KEY = b"twin-guardian-test-key"
+
+
+def test_readings_sealed_for_brain_and_guardian_are_judged_and_accepted(grig):
+    rig = grig()
+    rig.twin._guardian_key = TWIN_GUARDIAN_KEY          # as with twin-mock.yaml guardian_key_file
+    rig.guardian._twin_key = TWIN_GUARDIAN_KEY          # as with guardian-mock.yaml twin_key_file
+    rig.connect()
+    rig.tick(3)
+    assert rig.errors() == []
+    assert rig.guardian.ignored == 0
+    assert {v["sensor_id"] for v in rig.verdicts()} >= {"water-01", "temp-05"}
+
+
+def test_guardian_with_the_wrong_pair_key_ignores_the_readings(grig):
+    rig = grig()
+    rig.twin._guardian_key = TWIN_GUARDIAN_KEY
+    rig.guardian._twin_key = TWIN_KEY                   # mismatch: twin-brain key against the guardian tag
+    rig.connect()
+    rig.tick(2)
+    assert rig.guardian.ignored >= 2 * 44              # every reading of both ticks (44 sensors) refused

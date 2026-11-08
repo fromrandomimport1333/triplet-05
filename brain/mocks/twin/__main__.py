@@ -34,7 +34,8 @@ def main() -> None:
     def publish(topic: str, payload: str, qos: int, retain: bool) -> None:
         client.publish(topic, payload, qos, retain)
 
-    service = TwinService(publish, key=text.encode("utf-8"))
+    gtext = config.read_secret(cfg.get("guardian_key_file"))   # empty or missing = readings for the Brain only
+    service = TwinService(publish, key=text.encode("utf-8"), guardian_key=gtext.encode("utf-8") if gtext else None)
     status_topic = service.mapper.status("offline")[0]
     client = TwinMqtt(cfg["client_id"], will=(status_topic, service.status_payload("offline"), 1, True), logger=service.log)
     client.on_message = service.handle

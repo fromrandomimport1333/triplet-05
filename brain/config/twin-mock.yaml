@@ -6,6 +6,9 @@ client_id: twin-mock
 auth:                                   # broker account of the Twin (the Brain uses its own)
   username: twin
   password_file: secrets/twin-password.txt   # empty or missing file = no password
+# HMAC key shared with the Guardian (pair twin-guardian). Set: every message carries
+# "hmacs": {"brain": ..., "guardian": ...}; empty or missing file: a single "hmac" for the Brain.
+guardian_key_file: secrets/keys/twin-guardian.key
 
 topics:
   cmd: "brain/cmd/+"                    # commands from the Brain (output module)

@@ -144,7 +144,7 @@ own broker account in `secrets/guardian-password.txt` (`auth` in `config/guardia
 
 | Direction | Topic | Content |
 |---|---|---|
-| in | `city/+/sensor/+/+` | Twin readings. They are sealed for the Brain with the twin-brain key; the mock reads the body and, when it has that key, drops readings whose HMAC is wrong (`verify_twin_hmac`) |
+| in | `city/+/sensor/+/+` | Twin readings, sealed `hmacs` {`brain`: twin-brain key, `guardian`: twin-guardian key} (single `hmac` with the twin-brain key when `twin-mock.yaml: guardian_key_file` is missing). The mock checks its `guardian` tag with `twin_key_file` (falls back to the twin-brain key) and drops readings whose HMAC is wrong (`verify_twin_hmac`) |
 | in | `twin/meta` | city description (until it arrives: `mocks/city.yaml`) |
 | in | `guardian/control` | test control, sealed with the guardian-brain key |
 | out | `guardian/verdict/{sensor_id}` (retained) | `id`, `timestamp`, `source: guardian`, `correlation_id` = the reading id, `sensor_id`, `verdict` `trusted` / `suspicious` / `rejected`, `reason`, `trust_score` 0..1, `details` |

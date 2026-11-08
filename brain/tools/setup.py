@@ -13,6 +13,7 @@ Writes (all git-ignored, never committed):
     secrets/broker-password.txt              password of the `brain` account (config/security.yaml)
     secrets/twin-password.txt, guardian-password.txt, tester-password.txt   other accounts
     secrets/keys/twin-brain.key, guardian-brain.key                         HMAC keys (32 random bytes, hex)
+    secrets/keys/twin-guardian.key           Twin-Guardian pair key (the mock Twin signs readings for both)
 
 Python only (uses `cryptography`, already a Brain dependency): no OpenSSL or mosquitto_passwd needed.
 """
@@ -43,7 +44,7 @@ ACCOUNTS = {           # broker account -> password file (relative to secrets/)
     "guardian": "guardian-password.txt",
     "tester": "tester-password.txt",       # scenario runner (test control topics only)
 }
-HMAC_KEYS = ["twin-brain.key", "guardian-brain.key"]
+HMAC_KEYS = ["twin-brain.key", "guardian-brain.key", "twin-guardian.key"]
 PBKDF2_ITERATIONS = 101                     # Mosquitto's default for "$7$" hashes
 
 

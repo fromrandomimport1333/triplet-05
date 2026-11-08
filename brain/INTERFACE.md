@@ -9,7 +9,7 @@ partner, and how it authenticates. JSON Schemas of every body: `contracts/schema
 |---|---|
 | **Protocol** | MQTT 3.1.1 over **TLS** (port 8883), broker certificate signed by the triplet CA (`secrets/ca.crt`). No plaintext listener. |
 | **Broker account** | One per layer (`brain`, `twin`, `guardian`), password files in `secrets/`. A **topic ACL** lets each layer write only its own topics (`brain/broker/acl`): a Twin account cannot publish `brain/cmd/…`. |
-| **Message signature** | Every payload is an envelope `{"v": 1, "body": "<JSON text>", "hmac": "<hex>"}`, or `"hmacs": {"brain": …, "guardian": …}` when several layers read it. HMAC-SHA256 over the UTF-8 body text, **one key per pair of layers** (`secrets/keys/twin-brain.key`, `guardian-brain.key`). Ed25519 for Guardian is supported (`security.yaml: guardian_signature.mode`). |
+| **Message signature** | Every payload is an envelope `{"v": 1, "body": "<JSON text>", "hmac": "<hex>"}`, or `"hmacs": {"brain": …, "guardian": …}` when several layers read it. HMAC-SHA256 over the UTF-8 body text, **one key per pair of layers** (`secrets/keys/twin-brain.key`, `guardian-brain.key`; `twin-guardian.key` is created for the Twin and Guardian pair, the Brain does not use it). Ed25519 for Guardian is supported (`security.yaml: guardian_signature.mode`). |
 | **Freshness / replay** | `timestamp` within ±10 s, `id` unique for 60 s, `seq` increasing per device (if sent). Retained and Last-Will messages skip freshness/replay, never the signature. |
 | **Liveness** | Every layer publishes `<layer>/status` `online`, Last Will `offline` (retained). |
 
