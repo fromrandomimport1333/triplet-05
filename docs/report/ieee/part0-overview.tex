@@ -1,0 +1,200 @@
+\section{Part 0: Triplet Overview and Integration}
+\subsection{The problem and the idea}
+A smart city that reacts automatically to floods, fires and accidents has a new weakness: one broken or hacked
+sensor can open the wrong valve or close the wrong road. The challenge asks each triplet of teams to build three
+layers that together answer three questions: \emph{What is happening?} (the Twin), \emph{Is this data telling the truth?}
+(the Guardian) and \emph{What should we do?} (the City Brain). The idea of our triplet is that no action leaves the
+system on data nobody has checked: the Twin produces readings and calls, the Guardian gives every reading a trust
+verdict, the Brain weighs each source by that trust and acts only through signed, acknowledged commands. The three layers
+are separate programs that share one message bus, so each team builds and tests its layer alone and a partner is a
+configuration, not code.
+
+\subsection{Global architecture}
+Fig.~\ref{fig:triplet} shows the three layers and the data that flows between them. All traffic goes through one
+MQTT broker; there is no direct call between layers.
+
+\begin{figure}[t]
+\centering
+\resizebox{\columnwidth}{!}{%
+\begin{tikzpicture}[
+  box/.style={draw=navy, fill=navy!8, rounded corners=3pt, minimum height=8mm, align=center, font=\footnotesize},
+  ext/.style={draw=gray, fill=gray!10, rounded corners=3pt, minimum height=11mm, minimum width=24mm, align=center, font=\footnotesize},
+  arr/.style={-{Latex[length=2mm]}, thick, navy},
+  lab/.style={font=\scriptsize, align=center}]
+\node[ext] (twin) {\textbf{Twin}\\city, sensors,\\actuators, faults};
+\node[ext, right=16mm of twin] (guard) {\textbf{Guardian}\\trust verdicts,\\quarantine};
+\node[ext, right=16mm of guard] (brain) {\textbf{City Brain}\\detect, decide,\\act};
+\node[box, below=20mm of guard, minimum width=78mm] (bus) {MQTT 3.1.1 broker, TLS 8883\\one account per layer, topic access list};
+\draw[arr, <->] (twin.south) -- (twin.south |- bus.north) node[lab, midway, left]{meta, readings,\\calls, acks};
+\draw[arr, <->] (guard.south) -- (guard.south |- bus.north) node[lab, midway, right]{verdicts,\\quarantine};
+\draw[arr, <->] (brain.south) -- (brain.south |- bus.north) node[lab, midway, right]{commands,\\alerts, events};
+\node[box, below=7mm of bus, minimum width=78mm] (tl) {Brain timeline :8090 and graph API :8080 (read only)};
+\draw[arr, dashed] (bus.south) -- (tl.north);
+\end{tikzpicture}}
+\caption{The three layers around one broker. Arrows are publish/subscribe flows; the test REST API of the Twin (port 8000) is not part of the layer-to-layer traffic.}
+\label{fig:triplet}
+\end{figure}
+
+\subsection{How the layers communicate}
+\emph{Protocol.} MQTT~3.1.1~\cite{mqtt} over TLS on port 8883, with a certificate signed by a triplet CA and no plaintext
+listener. Each layer has its own account (\code{twin}, \code{guardian}, \code{brain}); the Brain's broker configuration lets the Twin
+write only \code{city/\#} and \code{twin/\#}, and the Guardian only \code{guardian/\#}.
+\emph{Authentication.} Every payload is an envelope \code{\{"v":1,"body":"<JSON text>","hmac"|"hmacs":\{...\}\}}. The tag is
+HMAC-SHA256~\cite{hmac} over the exact UTF-8 text of \code{body}, with one key per pair of layers (\code{twin-brain},
+\code{twin-guardian}, \code{guardian-brain}); a message read by two layers carries one tag for each. Every body has an \code{id}, a UTC
+\code{timestamp} with milliseconds, a \code{source} and, along a chain, a \code{correlation\_id}. Receivers accept a timestamp within
+$\pm10$~s, remember an \code{id} for 60~s and require \code{seq} to increase per sensor. Retained messages carry the city description,
+verdicts, quarantines and each layer's status, and every layer sets a last-will \code{offline} status.
+
+An envelope looks like this (the body is a JSON \emph{text}, signed exactly as sent; tags shortened):
+
+{\footnotesize\begin{verbatim}
+{"v":1,
+ "body":"{\"id\":\"tw1-water-07-126\",
+   \"timestamp\":\"2026-11-08T22:35:18.267Z\",
+   \"source\":\"twin\",\"sensor_id\":\"water-07\",
+   \"zone_id\":\"zone-a\",\"type\":\"water_level\",
+   \"value\":0.407,\"unit\":\"m\",\"seq\":126}",
+ "hmacs":{"brain":"503688..","guardian":"c1a9f0.."}}
+\end{verbatim}}
+
+A refused message is never dropped silently: the Brain reports it on \code{brain/error} with a code (wrong key, stale clock,
+repeated identifier, bad format, unknown device, value out of range), and the Twin logs why it refused a command.
+
+\begin{table}[t]
+\centering
+\caption{Topics between the layers (all QoS 1 unless noted; * = retained).}
+\label{tab:topics}
+\footnotesize
+\renewcommand{\arraystretch}{1.05}
+\scriptsize
+\begin{tabular}{@{}p{3.9cm} l p{2.7cm}@{}}
+\toprule
+\textbf{Topic} & \textbf{From} & \textbf{Content}\\
+\midrule
+\code{twin/meta}* & Twin & zones, sensors, actuators, units\\
+\code{city/\{z\}/sensor/\{t\}/\{id\}} & Twin & reading (QoS 0)\\
+\code{city/\{z\}/call} & Twin & emergency call\\
+\code{twin/actuator/\{id\}}, \code{twin/unit/\{id\}} & Twin & acknowledgement, state\\
+\code{twin/status}* & Twin & online / offline\\
+\code{guardian/verdict/\{id\}}* & Guardian & trusted, suspicious, rejected\\
+\code{guardian/quarantine/\{id\}}* & Guardian & quarantined, released\\
+\code{guardian/status}* & Guardian & online / offline\\
+\code{brain/cmd/\{id\}} & Brain & command to a device or unit\\
+\code{brain/alert}, \code{brain/error} & Brain & no effect; refused message\\
+\code{brain/event}, \code{brain/status}* & Brain & timeline; liveness\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+In this profile the Twin has no inbound REST interface for the other layers. Its REST API (port 8000) exists for tests only and uses separate
+keys for the Brain, the Guardian and the test scripts. The Brain's MCP server is a read-only math toolbox with no actuator tool, and
+the Guardian's profile uses MQTT alone, so no layer talks MCP to another.
+
+\subsection{One scenario traced end to end: a real flood}
+Table~\ref{tab:trace} follows a real flood through the Twin and the real Brain on 8 November (UTC), with the Brain's own Guardian
+stand-in: the Twin--Guardian wiring has so far been checked against the Guardian's interface specification and this stand-in only.
+A script raises the rain to 90~mm/h in \code{zone-a}; the canal sensor \code{water-07} rises.
+
+\begin{table}[t]
+\centering
+\caption{Real flood, Twin and Brain (22:33 UTC). Ids shortened.}
+\label{tab:trace}
+\footnotesize
+\renewcommand{\arraystretch}{1.05}
+\begin{tabular}{@{}l l p{5.3cm}@{}}
+\toprule
+\textbf{Time} & \textbf{Layer} & \textbf{Message}\\
+\midrule
+:37.3 & Guardian & \code{guardian/verdict/water-07}: trusted, score 0.95\\
+:45.30 & Brain & incident \emph{flood, zone-a, confidence 0.84}, caused by reading \code{water-07-32}\\
+:45.33 & Brain $\to$ Twin & \code{brain/cmd/valve-03}: \code{open}, \code{\{"opening":1.0\}}, and \code{brain/cmd/tl-01}: \code{priority}\\
+:46.27 & Twin & \code{twin/actuator/valve-03}: \code{result: done}, \code{state: open}; same for \code{tl-01}\\
+:46.69 & Brain & effect of the signal confirmed (a camera speed rose from 42.4 to 46.5)\\
+:54.70 & Brain & effect of the valve confirmed: \code{water-07} fell from 0.507 to 0.385~m; incident closed\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+In the attack variant a script makes the Twin publish a validly signed 4.2~m reading on the same sensor. The Guardian stand-in
+rejected it (\code{implausible\_jump}, score 0.05), quarantined \code{water-07}, and the Brain opened no incident and sent no command.
+The ack took about one second, the time of the Twin's next simulation step.
+
+\subsection{When a layer fails}
+Each layer publishes a retained status with a last will, so a partner's failure is visible within seconds and every layer has a
+defined degraded behaviour (Table~\ref{tab:degraded}); the Brain's own scenarios B4, B12 and B13 exercise the first rows.
+
+\begin{table}[t]
+\centering
+\caption{Degraded modes.}
+\label{tab:degraded}
+\footnotesize
+\renewcommand{\arraystretch}{1.05}
+\begin{tabular}{@{}l p{5.7cm}@{}}
+\toprule
+\textbf{Failure} & \textbf{What the others do}\\
+\midrule
+Guardian silent 30~s & Brain enters safe mode: risky actions (valve, grid shed, dispatch) need two different sensor types, low-risk ones still run\\
+Twin offline & Brain sends no command; when it returns, cooldowns and incidents are reset\\
+Brain offline & Twin keeps publishing; Guardian keeps judging and quarantining; nothing moves the actuators\\
+Local LLM offline & Brain decides with its rules alone\\
+Broker down & every layer reconnects by itself and republishes its retained state\\
+Actuator fails & Twin answers \code{failed} (or acknowledges with no effect); Brain re-decides without that device and Guardian counts an inconsistency\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Shared decisions}
+\begin{table}[t]
+\centering
+\caption{Decisions shared by the three layers.}
+\label{tab:shared}
+\footnotesize
+\renewcommand{\arraystretch}{1.05}
+\begin{tabular}{@{}l p{5.2cm}@{}}
+\toprule
+\textbf{Item} & \textbf{Decision}\\
+\midrule
+Units & water level m; air quality $\mu$g/m$^3$ (written \code{ug/m3}); traffic speed km/h; power kW (the Twin converts from \% of feeder)\\
+Identifiers & lower-case \code{[a-z0-9][a-z0-9-]*} for zones, sensors, actuators, units (Twin ids \code{WATER\_07} $\to$ \code{water-07})\\
+Zones & \code{zone-a} (east), \code{zone-b} (west); the pseudo zone \code{city} is never exposed\\
+Keys & one HMAC key per pair of layers, a broker password per account; files exchanged privately, never in git\\
+Versions & envelope \code{v: 1}; the Twin's stand-alone REST contract keeps \code{contract\_version} 1.0\\
+Liveness & statuses with last will; Guardian silent for 30~s means safe mode in the Brain; Twin offline means no command\\
+Ground truth & never on the bus: no fault label, no fault topic\\
+Ports & broker 8883 (Brain host); Brain timeline 8090, graph API 8080; Twin REST 8000; Guardian ports not fixed\\
+\bottomrule
+\end{tabular}
+\end{table}
+Start order: broker, Brain, Guardian, then Twin, which publishes its retained city description first so that the others learn the
+city from it. Clocks must agree within 10~s (NTP).
+
+\subsection{Integration status and open points}
+Table~\ref{tab:status} gives the status of every flow on 8 November. The Twin--Brain flows were verified with the real Brain;
+everything involving the Guardian was verified against its published interface (v1.3) and the Brain's stand-in, because the Guardian's code was not
+available to the Twin team.
+
+\begin{table}[t]
+\centering
+\caption{Status of each flow.}
+\label{tab:status}
+\footnotesize
+\renewcommand{\arraystretch}{1.05}
+\begin{tabular}{@{}l p{5.5cm}@{}}
+\toprule
+\textbf{Flow} & \textbf{Status}\\
+\midrule
+Twin $\to$ Brain & working with the real Brain: city description, 453 readings, no refusal\\
+Twin $\to$ Guardian & working with the Brain's Guardian stand-in; real Guardian not run\\
+Brain $\to$ Twin & working: valve, signal, grid, unit dispatch and recall, acknowledged within 4~s\\
+Guardian $\to$ Brain & consistent with the Brain's input checks; spoofed flood rejected, no action\\
+Guardian $\to$ Twin & implemented in the Twin; waiting for broker permission and a tag for the Twin\\
+Scenario runner $\to$ Twin & not implemented (the Twin is driven through its test REST API)\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Four points remain. (i) The Twin applies a quarantine notice, but the Twin account is not yet allowed to read
+\code{guardian/quarantine/\#} and the notice is sealed for the Brain only. (ii) The Twin--Guardian key has to be agreed and the
+real Guardian run against the Twin. (iii) The Brain's scenarios use mock-city ids and a \code{twin/control} message that the Twin does not
+implement. (iv) The Brain has no playbook for road closure or public alerts, and no \code{rescue} unit exists in the Twin.

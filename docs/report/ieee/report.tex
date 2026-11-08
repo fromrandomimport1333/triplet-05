@@ -17,9 +17,6 @@
 
 \title{City Brain: Detecting, Deciding and Acting Safely\\on Possibly Falsified City Data}
 
-\author{\IEEEauthorblockN{Triplet 05, City Brain team}
-\IEEEauthorblockA{TSYP14 City Brain Convergence, Phase 1\\
-IEEE ENSI Student Branch}}
 
 \maketitle
 
@@ -38,6 +35,10 @@ offline and its partners are configuration, not code.
 \begin{IEEEkeywords}
 smart city, incident response, MQTT, trust, prompt injection, safety rules, case-based reasoning
 \end{IEEEkeywords}
+
+\input{part0-overview.tex}
+
+\input{part1-twin.tex}
 
 \section{Introduction}
 The challenge links three layers: a digital \emph{Twin} that simulates the city and its actuators,
@@ -111,8 +112,8 @@ shows the flow.
 
 \subsection{Tech stack}
 Python 3.11 is used for every module, with pydantic models as contracts and JSON Schemas generated from them
-and checked in continuous integration. The broker is Mosquitto, with QoS~1 for commands. The graph API and the
-timeline use the standard-library HTTP server, with no external dependency and no CDN, so everything works without
+and checked in continuous integration. The broker is Mosquitto, with QoS~1 for commands. The graph API and
+the timeline use the standard-library HTTP server, with no external dependency and no CDN, so everything works without
 internet. The language model runs locally through Ollama. Docker Compose starts the broker, the Brain and the
 stand-ins together.
 
@@ -275,11 +276,93 @@ the LLM report itself offline.
 
 \section{Partner Layers}
 \subsection{Twin (Part 1)}
-\emph{[Placeholder: to be written by the Twin team: city model, sensors, actuators, units, fault injection and the interface they publish.]}
+The Twin layer is described in Part~1 of this report.
 
 \subsection{Guardian (Part 3)}
-\emph{[Placeholder: to be written by the Guardian team: trust scoring, verdicts, quarantine policy and the alerts they accept.]}
+The Guardian (team NexaGuard) answers one question for the triplet: ``Is this data telling the truth?''. For every reading
+it publishes a sealed verdict, \emph{trusted}, \emph{suspicious} or \emph{rejected}, with a score from 0 to 1, a reason and
+the \code{correlation\_id} of the reading judged, and it quarantines devices that keep lying. The Brain uses these outputs
+directly: a rejected reading opens no incident, a quarantined device receives no command (S1, S2), and a suspicious reading
+weighs less. Four goals shaped the design: catch falsified data fast, never punish a healthy device for an attack on the
+channel, never cry wolf on real events, and keep evidence that cannot be rewritten.
 
+\emph{Integration.} The Guardian is a client of the same MQTT broker, with its own account; the access list lets it write only
+under \code{guardian/\#}. It reads \code{twin/meta}, the readings on \code{city/\{zone\}/sensor/\{type\}/\{id\}}, the Twin's
+actuator and unit acknowledgements, and the Brain's commands and alerts. It publishes \code{guardian/verdict/\{sensor\_id\}} and
+\code{guardian/quarantine/\{device\_id\}} (both retained), and \code{guardian/status} with a last-will message. Every input is
+verified with the pair key, every output is sealed, and the city (sensors, units, minimum and maximum) is learned from
+\code{twin/meta}, so a partner change touches configuration only. A native profile (mTLS, JSON-RPC, Ed25519-signed verdicts)
+shares the same detection core and is selected by one switch.
+
+\emph{Pipeline.} Each reading passes the six steps of Table~\ref{tab:gpipe}; a reading that fails an early step is not scored
+further. The score maps to a verdict: at least 0.8 is trusted, 0.4 to 0.8 suspicious, below 0.4 rejected. The anomaly rule alone
+can only make a reading suspicious, because a step in traffic or power can be a real event (B11).
+
+\begin{table}[t]
+\centering
+\caption{Guardian pipeline: the six steps.}
+\label{tab:gpipe}
+\footnotesize
+\renewcommand{\arraystretch}{1.05}
+\begin{tabular}{@{}c p{1.9cm} p{4.6cm}@{}}
+\toprule
+\textbf{\#} & \textbf{Step} & \textbf{Check and outcome}\\
+\midrule
+1 & Schema, signature & topic and body agree, sensor known, HMAC valid; else \emph{rejected / bad\_hmac}\\
+2 & Replay & identifier window; \code{seq} strictly increasing; else \emph{rejected / replay}\\
+3 & Plausibility & sensor's own min and max; water-level step above 1.0~m per tick or rate above 0.8~m/s\\
+4 & Anomaly, frozen & EWMA with a noise floor per type; 8 identical readings, \emph{suspicious / frozen}\\
+5 & Score & trust score in $[0,1]$ mapped to a verdict\\
+6 & Publish & seal, store, append to audit log, publish\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\emph{Calibration.} Thresholds come from the figures in the Test Book and a synthetic Twin of 36 sensors at one reading per
+second. The step limit of 1.0~m per tick separates the T5 fake (0.4 to 1.8~m, a step of 1.4~m) from a real flood, which rises
+about 0.15~m/s, and from the valve, which lowers the level by 0.3~m at once. Other sensor types are checked against their
+minimum and maximum only.
+
+\emph{Containment.} A sensor is quarantined after three consecutive rejected readings, and an actuator after two
+acknowledgement inconsistencies: an acknowledgement matching no command, one from the wrong target, or a command never
+acknowledged (a retry is not counted). Any accepted reading resets a sensor's streak, so an isolated glitch never isolates a
+healthy device. Bad signatures and replays never count, so an attacker cannot get a healthy device isolated by forging traffic
+in its name. Release is explicit and logged.
+
+\emph{Evidence and liveness.} Every verdict, refusal and state change is appended to a SHA-256 hash-chained audit log in
+TimescaleDB; changing or deleting any past row breaks the chain, and database triggers block updates and deletions. While the
+Twin is silent, the Guardian re-sends the current verdict of each known sensor every 20~s, so the Brain's 30~s liveness rule
+holds (B13).
+
+\emph{Results.} Table~\ref{tab:gscen} lists the 11 Guardian scenarios; all pass in local mode, and the unit, contract and
+adversarial tests give 132 passed and 1 skipped (the skipped test needs a TimescaleDB instance and runs in continuous
+integration). In G6, the organizer's T5, the fake 1.8~m reading at $t=10$~s is \emph{rejected / implausible\_jump} in the same
+second, the log recording a step of 1.415~m against the limit of 1.0, and \code{water-01} is quarantined at $t=12$~s.
+
+\begin{table*}[t]
+\centering
+\caption{Guardian scenarios G1--G11 (local mode, synthetic Twin and Brain stand-ins; logs in \texttt{logs/}).}
+\label{tab:gscen}
+\footnotesize
+\renewcommand{\arraystretch}{1.05}
+\begin{tabular}{@{}l p{4.2cm} p{10.4cm} r@{}}
+\toprule
+\textbf{ID} & \textbf{Scenario} & \textbf{Expected (Guardian)} & \textbf{Result}\\
+\midrule
+G1 & Stuck water sensor, 6 min & \emph{suspicious / stuck\_sensor}; device suspicious, not quarantined. & PASS\\
+G2 & Spoofed flood, validly signed & 8.5~m after a 1.2~m baseline: first reading rejected; quarantine within 10~s. & PASS\\
+G3 & Replay attack & Same \code{event\_id} twice: first trusted, second \emph{rejected / replay}; no quarantine. & PASS\\
+G4 & Brain ignores a fake & Tampered and spoofed readings: Brain mock gets \emph{rejected} and dispatches nothing. & PASS\\
+G5 & Quarantine mid-flow & Quarantine exactly at the 3rd reject; other devices unaffected; admin release restores. & PASS\\
+G6 & Fake flood at the port (T5) & 1.8~m against a real 0.4~m: \emph{rejected / implausible\_jump}; quarantined at $t=12$~s. & PASS\\
+G7 & Inconsistent acknowledgements & Retry not counted; two inconsistencies quarantine \code{valve-01}; missing ack counted. & PASS\\
+G8 & Units and metadata & cm and vehicles/min accepted; 7.0~m on a 5~m sensor rejected; unknown sensor audited only. & PASS\\
+G9 & Bad HMAC & Five readings: \emph{rejected / bad\_hmac}, not retained, no quarantine. & PASS\\
+G10 & Frozen sensor & 8 identical readings: \emph{suspicious / frozen} at $t=17$~s; no quarantine. & PASS\\
+G11 & Twin silent for 120~s & Six refreshes; largest gap without a verdict 20~s. & PASS\\
+\bottomrule
+\end{tabular}
+\end{table*}
 \section{Limitations}
 \begin{itemize}
 \item \textbf{Hand-set parameters.} Thresholds, score tables and risk values were tuned on the mock city's 2\,\% noise, not learned from data.

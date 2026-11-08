@@ -1,0 +1,265 @@
+\section{Part 1: The City (Twin)}
+\subsection{Role and goals}
+The Twin simulates a part of central Tunis and is the only layer that touches the ``physical'' world: it publishes what the
+city sensors would measure and executes what the actuators are told to do. It also lets us attack our own system. Four goals
+shaped it.
+
+\begin{enumerate}
+\item \textbf{Realistic enough to be convincing.} Traffic comes from a SUMO simulation built from real OpenStreetMap data of
+central Tunis; water, rain, air quality and power come from small Python models.
+\item \textbf{Testable.} Eight kinds of fault can be injected on any device, and the true value is always kept apart, so a test can
+tell what the sensor said from what was real.
+\item \textbf{Safe for its partners.} Every command is validated before it can reach the simulation, and nothing that reveals a
+test fault ever leaves the Twin on the shared bus.
+\item \textbf{Connectable.} Where the partners are, which keys they use, how devices are named and how values are converted
+are configuration. The Twin also runs alone, with its own stand-ins for the Brain and the Guardian.
+\end{enumerate}
+
+\subsection{Architecture}
+The Twin is one Python process (Fig.~\ref{fig:twin}). Each simulated second it reads every sensor that is due, applies
+any injected fault, signs the message and publishes it. Commands arrive on a queue and are applied \emph{between} two
+simulation steps, because the SUMO control connection (TraCI) may only be used from one thread. The REST API runs in its own
+thread and never touches the simulation. The zones are \code{zone\_a}, the part of the map east of longitude 10.1775, and \code{zone\_b}, the part west of it.
+
+\begin{figure}[t]
+\centering
+\resizebox{\columnwidth}{!}{%
+\begin{tikzpicture}[
+  box/.style={draw=navy, fill=navy!8, rounded corners=3pt, minimum height=9mm, minimum width=19mm, align=center, font=\footnotesize},
+  ext/.style={draw=gray, fill=gray!10, rounded corners=3pt, minimum height=9mm, minimum width=19mm, align=center, font=\footnotesize},
+  arr/.style={-{Latex[length=2mm]}, thick, navy},
+  lab/.style={font=\scriptsize, align=center}]
+\node[box] (sim) {SUMO traffic\\+ models};
+\node[box, right=6mm of sim] (fault) {fault\\injection};
+\node[box, right=6mm of fault] (pub) {sign and\\publish};
+\node[box, right=6mm of pub] (br) {protocol\\bridge};
+\node[ext, right=6mm of br] (bus) {broker:\\Brain,\\Guardian};
+\node[box, below=9mm of fault] (q) {command\\queue};
+\node[ext, left=6mm of q] (rest) {REST API\\tests only};
+\draw[arr] (sim) -- (fault);
+\draw[arr] (fault) -- (pub);
+\draw[arr] (pub) -- (br);
+\draw[arr, <->] (br) -- (bus);
+\draw[arr] (rest) -- (q);
+\draw[arr] (br.south) |- (q.east);
+\draw[arr] (q.north) -- node[lab, right]{between steps} (fault.south);
+\end{tikzpicture}}
+\caption{Inside the Twin. Readings flow along the top; commands from the bridge or the test API wait in a queue and are applied between simulation steps.}
+\label{fig:twin}
+\end{figure}
+
+\emph{Sensors.} There are 43: 29 traffic cameras, a water-level pair on a canal (upstream and downstream), five rain gauges, four air-quality sensors, two power-load
+sensors and one city-wide emergency-call sensor (Table~\ref{tab:sensors}). Each publishes once per simulated second, except calls, which are events.
+A camera reports a vehicle count with mean speed (never above the road's limit), halted vehicles and density; in the SUMO-free \code{--fake} mode these fields are derived consistently from the count.
+The canal level rises with rain and falls by 0.05~m per simulated second while its valve is open. Emergency calls arrive at 12 per simulated hour and can also be sent through the API.
+
+\begin{table}[t]
+\centering
+\caption{Sensors (43) and what the Brain and the Guardian receive.}
+\label{tab:sensors}
+\footnotesize
+\renewcommand{\arraystretch}{1.05}
+\begin{tabular}{@{}l c p{2.6cm} p{2.6cm}@{}}
+\toprule
+\textbf{Family} & \textbf{N} & \textbf{Twin value} & \textbf{Sent to partners}\\
+\midrule
+Traffic camera & 29 & vehicles, speed, halted, density & \code{traffic\_speed} km/h\\
+Water level & 2 & m & \code{water\_level} m\\
+Rain & 5 & mm/h & not exposed\\
+Air quality & 4 & PM2.5 $\mu$g/m$^3$ & \code{air\_quality} \code{ug/m3}\\
+Power load & 2 & \% of feeder & \code{power\_load} kW\\
+Emergency calls & 1 & call event & \code{city/\{z\}/call}\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\emph{Actuators.} There are nine actuators of seven types and five emergency units (Table~\ref{tab:act}). Every command is
+acknowledged, then a second message reports that it took effect or failed. Valve, signal, road and grid commands act at the next simulation step; a dispatched unit
+drives to the zone centre with an arrival time from the route length at 40~km/h (or the straight line times 1.3 without SUMO) and stays busy for 120~s on the scene.
+
+\begin{table}[t]
+\centering
+\caption{Actuators.}
+\label{tab:act}
+\footnotesize
+\renewcommand{\arraystretch}{1.05}
+\begin{tabular}{@{}p{2.3cm} p{1.9cm} p{3.3cm}@{}}
+\toprule
+\textbf{Device} & \textbf{Type} & \textbf{Effect}\\
+\midrule
+\code{VALVE\_03} & water valve & open: canal falls 0.05~m/s\\
+\code{TL\_01} & traffic signal & SUMO signal phase 0 to 3\\
+\code{ROAD\_01} & road closure & cars may no longer use the road\\
+\code{ALERT\_01}, \code{ALERT\_02} & public alert & level and text, printed by the Twin\\
+\code{GRID\_A}, \code{GRID\_B} & power grid & zone power load $\times$ 1.0, 0.8 or 0.65\\
+\code{DISPATCH\_01} & emergency dispatch & nearest free unit (2 police, 2 ambulance, 1 civil protection)\\
+\code{QUARANTINE} & device quarantine & flags a sensor; Guardian key only\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\emph{Faults.} A fault test injects one of eight kinds on a device (Table~\ref{tab:faults}), for a given duration or until it is cleared. Each start and stop is recorded with a fault identifier for scoring.
+A spoofed camera count also changes its speed, halted vehicles and density, so that the fake never contradicts itself. The ground truth of every sensor (true value, active fault,
+quarantine state) is served only on a test-key endpoint.
+
+\begin{table}[t]
+\centering
+\caption{Fault kinds injected by the test API.}
+\label{tab:faults}
+\footnotesize
+\renewcommand{\arraystretch}{1.05}
+\begin{tabular}{@{}l p{5.6cm}@{}}
+\toprule
+\textbf{Kind} & \textbf{Effect on the device}\\
+\midrule
+\code{stuck} & repeats its last value (a camera: all fields)\\
+\code{dropout} & publishes nothing\\
+\code{spoof}, \code{spike} & publishes a chosen fake value\\
+\code{drift} & truth plus a slow linear offset per second\\
+\code{replay} & re-sends its last 30 genuine signed messages unchanged, with old \code{seq} and time\\
+\code{flood\_network} & many correctly signed readings per second\\
+\code{actuator\_stuck} & actuator refuses, or reports success with no effect (silent)\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\emph{Simulation and placement.} The SUMO scenario covers central Tunis. Cameras are placed 300 to 500~m apart on the busiest roads, ranked from a simulated 30-minute run, and each is attached to a named road so that its count and speed are real values from the simulation; a device that cannot be attached publishes nothing instead of an invented value.
+Water, rain, air and power are Python models driven by per-zone conditions (rain, jam level, pollution, power demand) that a test sets through the API; a reset puts the city back to a calm baseline (calm weather, valves closed, roads open, units at base, faults cleared).
+A run is repeatable: the random generators have fixed seeds.
+
+\subsection{Tech stack and why}
+\emph{Python 3.11} for the whole Twin, because SUMO's control library (TraCI) and the rest of the triplet are Python. \emph{SUMO} with the OSM Web Wizard gives real streets and
+vehicles from public map data; a \code{--fake} mode with the same interfaces runs without SUMO, which made development, unit tests and demos possible on any laptop.
+\emph{FastAPI and uvicorn} give the test REST API with automatic documentation. \emph{paho-mqtt} carries MQTT. \emph{JSON Schema} (Draft 2020-12, one schema per message type) validates every
+command, and \emph{pydantic} validates the fault and call bodies. \emph{PyYAML} holds all settings, with environment variables overriding the file, so no key or address is in code.
+\emph{pytest} runs the tests. Mosquitto serves the stand-alone mode, and Docker Compose and a PowerShell script start the whole stack.
+The partner protocol lives in three small modules: \code{protocol.py} (the signed envelope), \code{translate.py} (names, units and bodies) and \code{bridge.py} (the TLS client). The simulation code does not know
+that protocol; the bridge is the only code that does.
+
+\subsection{Interfaces in/out}
+The Twin has two profiles with the same core, chosen by one switch (\code{integration.enabled}).
+
+\emph{Stand-alone (default).} Readings go to a local broker on topics \code{city/<zone>/<kind>/<id>} as flat JSON with an in-message HMAC signature; the Brain and Guardian stand-ins of
+the Twin team use the REST API (port 8000, header \code{X-API-Key}): \code{POST /actuators/\{id\}} and \code{/tools/\{tool\}} for commands, \code{POST /quarantine/\{id\}} for the Guardian.
+A \code{GET /contract} describes it. This profile keeps the scenarios T1 to T12 running.
+
+\emph{With the real Brain and Guardian (integration profile).} The Twin becomes a normal client of the triplet's TLS broker (Part~0). \emph{Outputs:}
+\code{twin/meta} (retained, sent first, the whole city: zones, sensors with \code{min}, \code{max}, \code{alert} and unit, actuators with their actions, units),
+readings on \code{city/\{zone\}/sensor/\{type\}/\{id\}}, calls on \code{city/\{zone\}/call}, acknowledgements on \code{twin/actuator/\{id\}} and \code{twin/unit/\{id\}}, and \code{twin/status}
+with a last will. \emph{Inputs:} \code{brain/cmd/\{id\}}, \code{guardian/quarantine/\{id\}} and \code{brain/error}. A real example:
+
+{\footnotesize\begin{verbatim}
+brain/cmd/valve-03 {"id":"brain-to7fyr-000001",
+ "source":"brain","target_id":"valve-03",
+ "action":"open","parameters":{"opening":1.0}}
+twin/actuator/valve-03 {"correlation_id":
+ "brain-to7fyr-000001","actuator_id":"valve-03",
+ "state":"open","result":"done"}
+\end{verbatim}}
+
+The bridge turns Brain actions into Twin commands (Table~\ref{tab:xlate}) and acknowledges each within 4~s. The Brain retries an unanswered command once with the same \code{id}, so the
+Twin applies each \code{id} once and answers a retry with the first answer. Quarantined sensors are flagged inside the Twin; later commands to a quarantined actuator or unit are answered \code{rejected} with reason \code{quarantined}.
+Declared sensors, units, names and conversions come from one \code{integration:} section of \code{city.yaml}: for example camera speed becomes a \code{traffic\_speed} sensor,
+power percent becomes kW through a scale, civil protection is declared as \code{fire\_truck} (the Brain's name), and rain is hidden because no partner uses it.
+
+\begin{table}[t]
+\centering
+\caption{Brain actions and their Twin translation.}
+\label{tab:xlate}
+\footnotesize
+\renewcommand{\arraystretch}{1.05}
+\begin{tabular}{@{}p{3.8cm} p{3.8cm}@{}}
+\toprule
+\textbf{Brain command} & \textbf{Twin command}\\
+\midrule
+\code{valve-03 open} / \code{close} & \code{VALVE\_03} state \code{open} / \code{closed}\\
+\code{tl-01 priority} / \code{normal} & \code{TL\_01} phase 2 / 0 (configurable)\\
+\code{grid-a shed} / \code{normal} & \code{GRID\_A} action \code{shed} / \code{normal}\\
+\code{<unit> dispatch \{zone\_id\}} & \code{DISPATCH\_01} for that unit (acks \code{en\_route})\\
+\code{<unit> recall} & unit freed now, then \code{free}\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\emph{Test REST API (port 8000, both profiles).} It lets scripts and humans drive and inspect the Twin; it is not used by the Brain or the Guardian in the integration profile.
+
+\begin{table}[t]
+\centering
+\caption{Test REST API (header \code{X-API-Key}).}
+\label{tab:rest}
+\footnotesize
+\renewcommand{\arraystretch}{1.05}
+\begin{tabular}{@{}p{3.4cm} p{4.5cm}@{}}
+\toprule
+\textbf{Call} & \textbf{Purpose (key)}\\
+\midrule
+\code{GET /health}, \code{/contract}, \code{/devices} & discovery (none)\\
+\code{POST /actuators/\{id\}} & command a device (Brain key)\\
+\code{POST /quarantine/\{id\}} & isolate a sensor (Guardian key)\\
+\code{POST /faults}, \code{DELETE /faults/\{id\}} & inject or clear a fault (test key)\\
+\code{POST /scenario/conditions}, \code{/scenario/reset} & rain, jam, pollution, demand; calm baseline (test key)\\
+\code{POST /emergency\_calls} & create a call, genuine or fake (test key)\\
+\code{GET /truth/\{id\}}, \code{/events} & ground truth and history (test key)\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\emph{Test and evaluation.} 50 automated tests pass (46 for the Twin and the bridge, 4 for the scenario helpers), including the published HMAC test vector and a bridge exercised without a broker. On 8 November the stand-alone
+scenarios ran against the Twin's stand-ins in \code{--fake} mode: T1 to T6 and T8 passed all checks and T7 passed 11 of 12; T9, T11 and T12 had passed earlier the same day and T10 had passed 4 of 5.
+The integration profile ran against the real Brain, with the Brain's Guardian stand-in on a Python MQTT broker with TLS: the Brain accepted the city description (2 zones, 37 sensors, 4 actuators, 5 units) and 453 readings with no
+refusal, executed a flood response as in Table~\ref{tab:trace} and a fire dispatch, acknowledged a command it could not execute with a reason, and refused a command sealed with a wrong key; a spoofed reading was rejected and the Brain did not act on it.
+
+Table~\ref{tab:checked} lists the main checks of the simulation itself, run on 6 November with temporary scripts, on SUMO and in \code{--fake} mode.
+
+\begin{table}[t]
+\centering
+\caption{Main checks of the Twin.}
+\label{tab:checked}
+\footnotesize
+\renewcommand{\arraystretch}{1.05}
+\begin{tabular}{@{}p{4.6cm} p{3.3cm}@{}}
+\toprule
+\textbf{Check} & \textbf{Result}\\
+\midrule
+All 42 sensors publish; 200~s of signatures verified & passed, none invalid\\
+29 cameras attach to their roads and see traffic within 1,800 simulated s & 29 of 29\\
+No camera speed above its road limit & none in about 18,600 readings\\
+Invalid commands refused with 422, simulation keeps running & 30 of 30 checks, on both modes\\
+Emergency calls: storing, signatures, filters, fakes, restart & 30 of 30 checks\\
+Rain raises the canal, an open valve lowers it & 0.406 $\to$ 1.24 $\to$ 0.877~m\\
+Closing the road: cars using it in 10 min & 61 open, 1 closed\\
+Closing the road: speed on the feeding road & 43 km/h open, 3 km/h closed\\
+Long run without a window & no crash up to 5,292 simulated s\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Security measures}
+\begin{itemize}
+\item \textbf{Separate keys per role (REST).} The Brain key may command actuators, the Guardian key may only quarantine or release a device, and a test key alone may inject faults, change conditions, reset
+and read the ground truth. A key used outside its role gets HTTP 403, an unknown key 401.
+\item \textbf{Input validation.} Every command is checked against a JSON Schema and the actuator's own rules (valid phases and states, alert text of 1 to 280 characters, known zones and units); an invalid
+command gets HTTP 422 with a precise reason, is never queued and cannot stop the simulation.
+\item \textbf{Authenticated, encrypted bus.} In the integration profile all traffic is MQTT over TLS with a broker account, and every message is sealed with HMAC-SHA256 over its exact text, one tag per receiving layer.
+Commands must carry a valid tag for the Twin, a timestamp within 10~s and a known target; a bad envelope, wrong key or stale message is dropped with one explicit log line and nothing is executed.
+\item \textbf{Replay protection.} Readings carry \code{seq} and a unique \code{id} built from a run identifier, so a restart is not mistaken for a replay; commands are applied once per \code{id}.
+\item \textbf{No leak of the answer.} Only the fields of the partners' contract are published: a whitelist drops the \code{fault} label, and the \code{city/faults} topic and \code{/truth} never reach the broker.
+\item \textbf{Least privilege on the broker.} The broker's access list lets the Twin write only its own topics, so it cannot publish a Brain command.
+\item \textbf{Secrets outside the code.} Keys, passwords and the CA are read from files or environment variables and are excluded from version control.
+\item \textbf{Fail-safe behaviour.} A last will marks the Twin offline if it dies, after which the Brain sends no commands to it.
+\end{itemize}
+
+\subsection{Known limitations}
+\begin{itemize}
+\item \textbf{Simple models.} Water, rain, air and power are placeholder formulas, rain is one value for the whole city, and the water rise is faster than a real canal. Actuator effects are immediate, except dispatch.
+\item \textbf{Simulated calls are random.} They do not react to rain, floods or jams, and calls for a scenario are sent through the API.
+\item \textbf{Scenarios ran in \code{--fake} mode only.} The SUMO mode runs but no scenario has been repeated on it. The partner profile was tested with the SUMO-free Twin.
+\item \textbf{Partners not fully tested.} No real Guardian was available, and the broker used for the joint test was a Python broker without a topic access list, so permissions are untested.
+\item \textbf{Quarantine path incomplete.} The Twin applies Guardian notices, but cannot yet receive them from the real broker: its account lacks read access to the quarantine topics and the notices are not sealed for it.
+\item \textbf{Not everything is exposed.} Rain, traffic density and traffic flow are not sent to partners; the road closure and public alert actuators are not declared because the Brain has no playbook for them.
+\item \textbf{Two mismatches with the Brain.} The Brain's flood playbook asks for a \code{rescue} unit that the Twin does not have, and its scenarios use mock-city ids and a control message the Twin does not implement.
+\item \textbf{Water floor.} An open valve drains the canal to a 0.1~m floor where the reading stays constant, which a Guardian may judge frozen.
+\item \textbf{Placeholders to confirm.} The power scale (1000~kW feeder), the alert levels (water 1.3~m, air 150) and the signal phase map are agreed values awaiting confirmation.
+\item \textbf{Stand-alone mode is not hardened.} It uses plaintext MQTT and development keys; the API listens on all interfaces. Use the integration profile or a private network.
+\item \textbf{Known display limits.} Road closures stop cars only, zones are a simple split by longitude, and the map is the SUMO desktop window.
+\end{itemize}
