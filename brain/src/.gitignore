@@ -1,0 +1,11 @@
+build/
+dist/
+*.o
+*.a
+*.so
+*.so.*
+__pycache__/
+*.egg-info/
+.pytest_cache/
+bindings/python/citybrain/_citybrain_cffi*
+_vendor_build/

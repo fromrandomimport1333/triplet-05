@@ -1,0 +1,31 @@
+id: B8
+name: Best valve quarantined
+layers: [twin, guardian, brain]
+description: >
+  Flood at the port while Guardian has quarantined valve-01, the valve that drains zone-01. The Brain
+  must never command a quarantined device: the valve action is refused (rule S1) or another action
+  is chosen, and the timeline says so.
+trigger: python scenarios/run.py B8
+expected:
+  twin: Flood in zone-01 from 8 s; valve-01 quarantined and refusing commands (reason quarantined).
+  guardian: Quarantine notice for valve-01 at the start; water-01 trusted.
+  brain: Flood incident; no command to valve-01; outcome refused (S1) for valve-01 or a decision with another action.
+how_to_verify: >
+  Timeline: valve-01 quarantined -> incident opened -> valve-01 refused (S1) or alternative chosen.
+  logs/B8-*.log: no brain/cmd/valve-01 line.
+duration_s: 60
+twin:
+  reset: {seed: 7, scenario: flood, scenario_zone: zone-01, scenario_after_ticks: 8}
+  actuator_modes: {valve-01: reject_quarantined}
+  actions:
+    - {at_s: 0, op: contain, device_id: valve-01, action: quarantine}
+guardian: {modes: [auto, "quarantine:valve-01"]}
+expect:
+  - {quarantine: quarantined, match: {device_id: valve-01}, within_s: 5}
+  - {event: device_quarantined, text: valve-01, within_s: 5}
+  - {event: incident_opened, match: {zone_id: zone-01, type: flood}, within_s: 25}
+  - {no_command: {target_id: valve-01}}
+  - any_of:
+      - {outcome: refused, match: {target_id: valve-01, rule: S1}}
+      - {decision: {target_type: [valve, traffic_signal, rescue, ambulance]}, match: {}}
+    within_s: 45

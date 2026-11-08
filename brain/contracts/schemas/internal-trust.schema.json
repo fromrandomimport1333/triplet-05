@@ -1,0 +1,58 @@
+{
+  "additionalProperties": false,
+  "description": "brain/internal/trust/{sensor_id} (retained). trust_score is null when Guardian gives none.",
+  "properties": {
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "timestamp": {
+      "title": "Timestamp",
+      "type": "string"
+    },
+    "correlation_id": {
+      "title": "Correlation Id",
+      "type": "string"
+    },
+    "sensor_id": {
+      "title": "Sensor Id",
+      "type": "string"
+    },
+    "verdict": {
+      "enum": [
+        "trusted",
+        "suspicious",
+        "rejected"
+      ],
+      "title": "Verdict",
+      "type": "string"
+    },
+    "trust_score": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Trust Score"
+    },
+    "reason": {
+      "title": "Reason",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "timestamp",
+    "correlation_id",
+    "sensor_id",
+    "verdict",
+    "trust_score",
+    "reason"
+  ],
+  "title": "InternalTrust",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

@@ -1,0 +1,93 @@
+{
+  "additionalProperties": false,
+  "description": "brain/internal/outcome: what happened to one action of a decision (team plan 05, section 5).",
+  "properties": {
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "timestamp": {
+      "title": "Timestamp",
+      "type": "string"
+    },
+    "correlation_id": {
+      "title": "Correlation Id",
+      "type": "string"
+    },
+    "incident_id": {
+      "title": "Incident Id",
+      "type": "string"
+    },
+    "decision_id": {
+      "title": "Decision Id",
+      "type": "string"
+    },
+    "target_id": {
+      "title": "Target Id",
+      "type": "string"
+    },
+    "action": {
+      "title": "Action",
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "sent",
+        "refused",
+        "acknowledged",
+        "failed"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "command_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Command Id"
+    },
+    "rule": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Rule"
+    },
+    "detail": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Detail"
+    }
+  },
+  "required": [
+    "id",
+    "timestamp",
+    "correlation_id",
+    "incident_id",
+    "decision_id",
+    "target_id",
+    "action",
+    "status"
+  ],
+  "title": "Outcome",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

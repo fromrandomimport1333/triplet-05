@@ -1,0 +1,8 @@
+# Organizer example T5 (Phase 1 specification, Test Book): the same run as B3, under its official id.
+alias_of: B3
+id: T5
+name: Fake flood at the port (organizer example T5)
+trigger: python scenarios/run.py T5
+how_to_verify: >
+  Timeline: water-01 = 1.8 m -> Guardian rejected (implausible_jump) within 10 s -> water-01
+  quarantined -> no valve command. logs/T5-*.log: verdict line, no brain/cmd/valve-* line, PASS summary.

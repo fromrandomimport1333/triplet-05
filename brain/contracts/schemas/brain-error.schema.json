@@ -1,0 +1,62 @@
+{
+  "additionalProperties": false,
+  "description": "brain/error body (BR-5).",
+  "properties": {
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "timestamp": {
+      "title": "Timestamp",
+      "type": "string"
+    },
+    "source": {
+      "const": "brain",
+      "default": "brain",
+      "title": "Source",
+      "type": "string"
+    },
+    "code": {
+      "enum": [
+        "E_FORMAT",
+        "E_AUTH",
+        "E_STALE",
+        "E_REPLAY",
+        "E_UNKNOWN_ID",
+        "E_RANGE"
+      ],
+      "title": "Code",
+      "type": "string"
+    },
+    "topic": {
+      "title": "Topic",
+      "type": "string"
+    },
+    "message_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Message Id"
+    },
+    "detail": {
+      "title": "Detail",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "timestamp",
+    "code",
+    "topic",
+    "detail"
+  ],
+  "title": "BrainError",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

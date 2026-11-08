@@ -1,0 +1,32 @@
+id: B11
+name: Fire, power spike and a jam next door
+layers: [twin, guardian, brain]
+description: >
+  A fire at the substation (zone-05: particulates and power load up, fire calls) and, from 10 s, a
+  traffic jam in the neighbouring centre (zone-03). The Brain must recognise the situation as linked
+  (the jam is next to the fire) and answer it: a fire truck to zone-05, traffic measures; the LLM
+  proposal is used when available.
+trigger: python scenarios/run.py B11
+expected:
+  twin: Fire readings and calls in zone-05 from 5 s, jam readings in zone-03 from 10 s.
+  guardian: Readings trusted (the steps are real events).
+  brain: Fire incident in zone-05 answered with a fire truck dispatch; the jam is handled with the fire (one decision covering both, or a linked incident); LLM proposal used if the LLM is up.
+how_to_verify: >
+  Timeline: fire incident -> LLM proposal -> decision -> fire truck dispatch; jam shown next to it.
+  logs/B11-*.log: brain/cmd/unit-fire-* dispatch, proposal with origin llm.
+duration_s: 60
+twin:
+  reset: {seed: 7, scenario: fire, scenario_zone: zone-05, scenario_after_ticks: 5}
+  actions:
+    - {at_s: 10, op: trigger, scenario: traffic-jam, zone: zone-03}
+guardian: {modes: [auto]}
+llm: {mode: scripted}
+expect:
+  - {event: incident_opened, match: {zone_id: zone-05, type: fire}, within_s: 25}
+  - {command: {target_type: fire_truck, action: dispatch}, within_s: 45}
+  - any_of:
+      - {event: incident_opened, match: {zone_id: zone-03, type: traffic_jam}}
+      - {decision: {target_type: traffic_signal}, match: {}}
+    within_s: 50
+  - {proposal: llm, within_s: 40, optional: true}
+  - {no_verdict: rejected}

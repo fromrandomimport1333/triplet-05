@@ -1,0 +1,5 @@
+# Scenario runner (scenarios/run.py). It uses the broker and TLS settings of the Brain, but its own
+# broker account: the ACL (brain/broker/acl) lets `tester` write only the mocks' control topics.
+auth:
+  username: tester
+  password_file: secrets/tester-password.txt   # created by python tools/setup.py

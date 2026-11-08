@@ -1,0 +1,27 @@
+id: B1
+name: Calm day with a rush hour
+layers: [twin, guardian, brain]
+description: >
+  A normal day in the six zones, with a rush hour in the middle: speed falls, density triples and
+  flow rises in every zone, but no reading reaches an alert and there is no call. The Brain must see
+  a busy but normal city and not overreact.
+trigger: python scenarios/run.py B1
+expected:
+  twin: Readings of all 36 sensors every second; traffic follows a smooth rush-hour peak between 10 s and 50 s.
+  guardian: Every sensor trusted (the rush hour is a slow change, not a jump).
+  brain: No incident opened, no command sent, no input error.
+how_to_verify: >
+  Timeline shows readings and trusted verdicts only, no incident or command. In logs/B1-*.log the
+  summary line lists every expectation as passed; no brain/cmd or brain/internal/incident line.
+duration_s: 60
+observe: {readings: [traffic-density-03]}
+twin:
+  reset: {seed: 7, scenario: calm, rush_hour: {start_tick: 10, end_tick: 50}}
+guardian: {modes: [auto]}
+expect:
+  - {reading: traffic-density-03, match: {value: {gt: 60}}, after_s: 20, within_s: 40, note: rush hour is visible}
+  - {verdict: trusted, match: {sensor_id: traffic-density-03}}
+  - {no_verdict: [rejected, suspicious]}
+  - {no_event: incident_opened}
+  - {no_command: any}
+  - {no_error_code: any}

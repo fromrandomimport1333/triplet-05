@@ -1,0 +1,26 @@
+id: B14
+name: Burnt toast in the residential zone (smoke without fire)
+layers: [twin, guardian, brain]
+description: >
+  From 5 s the residential zone (zone-06) fills with as much smoke as the fire of B5 (air quality
+  12 -> 250 ug/m3, above its alert level), but it is burnt toast: the Twin replays a NIST smoke alarm
+  test of toast (held out of the case memory), so smoke rises while CO, CO2 and heat stay flat.
+  Nobody calls. The case memory recognises cooking among the most similar lab cases, detection holds
+  the smoke readings down, and no fire is opened: no fire truck leaves for a kitchen.
+trigger: python scenarios/run.py B14
+expected:
+  twin: Air quality above alert in zone-06, smoke sensor up, CO, CO2 and temperature at their calm values; no call.
+  guardian: Readings trusted (the smoke is real, only its cause is harmless).
+  brain: Case memory verdict COOKING for zone-06 on the timeline; no fire incident in zone-06; no fire truck dispatched.
+how_to_verify: >
+  Timeline: "smoke looks like COOKING, not a fire: 15 of 15 most similar lab cases are cooking"; map badge
+  COOKING SMOKE, NOT FIRE on the Residential zone; no incident row, no beam to a fire truck.
+  logs/B14-*.log: a case_nuisance event, no incident_opened for zone-06 fire, no brain/cmd/unit-fire-*.
+duration_s: 60
+twin:
+  reset: {seed: 7, scenario: cooking, scenario_zone: zone-06, scenario_after_ticks: 5}
+guardian: {modes: [auto]}
+expect:
+  - {event: case_nuisance, text: zone-06, within_s: 40}
+  - {no_event: incident_opened, match: {zone_id: zone-06, type: fire}}
+  - {no_command: {target_type: fire_truck}}

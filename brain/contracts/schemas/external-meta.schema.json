@@ -1,0 +1,303 @@
+{
+  "$defs": {
+    "ActuatorDecl": {
+      "properties": {
+        "actuator_id": {
+          "maxLength": 64,
+          "pattern": "^[a-z0-9][a-z0-9-]*$",
+          "title": "Actuator Id",
+          "type": "string"
+        },
+        "type": {
+          "title": "Type",
+          "type": "string"
+        },
+        "zone_id": {
+          "maxLength": 64,
+          "pattern": "^[a-z0-9][a-z0-9-]*$",
+          "title": "Zone Id",
+          "type": "string"
+        },
+        "controls": {
+          "default": [],
+          "items": {
+            "maxLength": 64,
+            "pattern": "^[a-z0-9][a-z0-9-]*$",
+            "type": "string"
+          },
+          "title": "Controls",
+          "type": "array"
+        },
+        "actions": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Actions",
+          "type": "array"
+        }
+      },
+      "required": [
+        "actuator_id",
+        "type",
+        "zone_id",
+        "actions"
+      ],
+      "title": "ActuatorDecl",
+      "type": "object"
+    },
+    "SensorDecl": {
+      "properties": {
+        "sensor_id": {
+          "maxLength": 64,
+          "pattern": "^[a-z0-9][a-z0-9-]*$",
+          "title": "Sensor Id",
+          "type": "string"
+        },
+        "zone_id": {
+          "maxLength": 64,
+          "pattern": "^[a-z0-9][a-z0-9-]*$",
+          "title": "Zone Id",
+          "type": "string"
+        },
+        "type": {
+          "title": "Type",
+          "type": "string"
+        },
+        "unit": {
+          "title": "Unit",
+          "type": "string"
+        },
+        "min": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "integer"
+            }
+          ],
+          "title": "Min"
+        },
+        "max": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "integer"
+            }
+          ],
+          "title": "Max"
+        },
+        "alert": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Alert"
+        }
+      },
+      "required": [
+        "sensor_id",
+        "zone_id",
+        "type",
+        "unit",
+        "min",
+        "max"
+      ],
+      "title": "SensorDecl",
+      "type": "object"
+    },
+    "UnitDecl": {
+      "properties": {
+        "unit_id": {
+          "maxLength": 64,
+          "pattern": "^[a-z0-9][a-z0-9-]*$",
+          "title": "Unit Id",
+          "type": "string"
+        },
+        "type": {
+          "title": "Type",
+          "type": "string"
+        },
+        "home_zone": {
+          "anyOf": [
+            {
+              "maxLength": 64,
+              "pattern": "^[a-z0-9][a-z0-9-]*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Home Zone"
+        }
+      },
+      "required": [
+        "unit_id",
+        "type"
+      ],
+      "title": "UnitDecl",
+      "type": "object"
+    },
+    "ZoneDecl": {
+      "properties": {
+        "zone_id": {
+          "maxLength": 64,
+          "pattern": "^[a-z0-9][a-z0-9-]*$",
+          "title": "Zone Id",
+          "type": "string"
+        },
+        "name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Name"
+        },
+        "type": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Type"
+        },
+        "exposure": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Exposure"
+        },
+        "adjacent": {
+          "default": [],
+          "items": {
+            "maxLength": 64,
+            "pattern": "^[a-z0-9][a-z0-9-]*$",
+            "type": "string"
+          },
+          "title": "Adjacent",
+          "type": "array"
+        }
+      },
+      "required": [
+        "zone_id"
+      ],
+      "title": "ZoneDecl",
+      "type": "object"
+    }
+  },
+  "description": "twin/meta: city description (TW-1, TW-2).",
+  "properties": {
+    "id": {
+      "maxLength": 128,
+      "minLength": 1,
+      "title": "Id",
+      "type": "string"
+    },
+    "timestamp": {
+      "title": "Timestamp",
+      "type": "string"
+    },
+    "source": {
+      "enum": [
+        "twin",
+        "guardian",
+        "brain"
+      ],
+      "title": "Source",
+      "type": "string"
+    },
+    "correlation_id": {
+      "anyOf": [
+        {
+          "maxLength": 128,
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Correlation Id"
+    },
+    "seq": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Seq"
+    },
+    "zones": {
+      "items": {
+        "$ref": "#/$defs/ZoneDecl"
+      },
+      "title": "Zones",
+      "type": "array"
+    },
+    "sensors": {
+      "items": {
+        "$ref": "#/$defs/SensorDecl"
+      },
+      "title": "Sensors",
+      "type": "array"
+    },
+    "actuators": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/ActuatorDecl"
+      },
+      "title": "Actuators",
+      "type": "array"
+    },
+    "units": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/UnitDecl"
+      },
+      "title": "Units",
+      "type": "array"
+    }
+  },
+  "required": [
+    "id",
+    "timestamp",
+    "source",
+    "zones",
+    "sensors"
+  ],
+  "title": "MetaBody",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

@@ -1,0 +1,49 @@
+# Settings of the input module (front door). Nothing here is hard-coded in src/input/.
+
+checks:
+  clock_window_s: 10        # SEC-12: reject if timestamp further than this from our clock (E_STALE)
+  replay_window_s: 60       # SEC-13: remember ids this long (E_REPLAY)
+  replay_cleanup_s: 5       # how often old ids are purged
+  check_seq: true           # if the Twin adds `seq`, it must increase per device
+  max_payload_bytes: 16384  # MSG-6
+  # Retained messages (city description, verdicts, quarantines, status) are
+  # delivered again when the Brain (re)subscribes, so they are old by design.
+  # They still pass HMAC / format / ID checks, but skip freshness and replay.
+  retained_skip_freshness: true
+  # Last Will payloads are written when the client connects, so they are always
+  # old when the broker fires them. Status topics skip freshness and replay.
+  status_skip_freshness: true
+  drift_warn_s: 2           # log a clock_drift warning above this (ask the Twin to use NTP)
+
+layers:
+  # Guardian is marked offline if no verdict arrives for this long (0 = off)
+  guardian_silence_s: 30
+  tick_s: 1
+  stats_every_s: 30         # log messages/s and time per message (0 = off)
+
+# Field-name differences found at the first joint run go here (old -> ours),
+# per message kind. Applied to the body before format checks.
+field_map:
+  meta: {}
+  reading: {}          # e.g. {event_id: id, device_id: sensor_id}
+  call: {}
+  actuator: {}
+  unit: {}
+  verdict: {}
+  quarantine: {}
+  twin_status: {}
+  guardian_status: {}
+
+# Value aliases (external value -> internal value)
+verdict_aliases:
+  suspect: suspicious        # spec v0.1 says "suspect", Guardian says "suspicious"
+
+errors:
+  # brain/error is rate-limited so a flood of bad messages cannot flood the
+  # broker in return. Every rejection is still logged.
+  max_published_per_s: 50
+
+logging:
+  file: logs/input.jsonl
+  level: INFO
+  log_accepted: false        # one log line per accepted message (heavy at 200 msg/s)

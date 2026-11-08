@@ -1,0 +1,3 @@
+# Docker overlay: published on the host (docker-compose.yml) for the report and the timeline chain view.
+http:
+  host: 0.0.0.0

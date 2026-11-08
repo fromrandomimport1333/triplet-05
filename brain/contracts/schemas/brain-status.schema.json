@@ -1,0 +1,36 @@
+{
+  "additionalProperties": false,
+  "description": "brain/status body (BR-4).",
+  "properties": {
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "timestamp": {
+      "title": "Timestamp",
+      "type": "string"
+    },
+    "source": {
+      "const": "brain",
+      "default": "brain",
+      "title": "Source",
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "online",
+        "offline"
+      ],
+      "title": "Status",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "timestamp",
+    "status"
+  ],
+  "title": "BrainStatus",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

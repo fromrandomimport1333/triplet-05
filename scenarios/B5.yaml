@@ -1,0 +1,33 @@
+id: B5
+name: Fire and accident, one ambulance
+layers: [twin, guardian, brain]
+description: >
+  A fire in the industrial zone (zone-05) from 5 s and an accident in the centre (zone-03) from 8 s.
+  unit-ambulance-02 is out of service (quarantined by Guardian and in the Twin), so only
+  unit-ambulance-01 can go. The higher-priority incident gets it; the other gets the other units.
+trigger: python scenarios/run.py B5
+expected:
+  twin: Fire readings and calls in zone-05, accident readings and calls in zone-03; unit-ambulance-02 refuses commands.
+  guardian: Readings trusted; unit-ambulance-02 quarantined from the start.
+  brain: Two incidents (the fire also recognised by the case memory); unit-ambulance-01 dispatched once, to the incident with the higher priority (numbers on the timeline); never unit-ambulance-02; a fire truck to zone-05.
+how_to_verify: >
+  Timeline: two incidents opened -> decisions with their scores -> one ambulance dispatch -> fire
+  truck dispatch. logs/B5-*.log: one brain/cmd/unit-ambulance-01 dispatch, none to unit-ambulance-02.
+duration_s: 60
+twin:
+  reset: {seed: 7, scenario: fire, scenario_zone: zone-05, scenario_after_ticks: 5}
+  actuator_modes: {unit-ambulance-02: reject_quarantined}
+  actions:
+    - {at_s: 0, op: contain, device_id: unit-ambulance-02, action: quarantine}
+    - {at_s: 8, op: trigger, scenario: accident, zone: zone-03}
+guardian: {modes: [auto, "quarantine:unit-ambulance-02"]}
+expect:
+  - {event: device_quarantined, text: unit-ambulance-02, within_s: 5}
+  - {event: incident_opened, match: {zone_id: zone-05, type: fire}, within_s: 25}
+  - {event: case_fire, text: zone-05, within_s: 50}      # the case memory recognises a real fire (NIST flaming foam, held out)
+  - {event: incident_opened, match: {zone_id: zone-03, type: accident}, within_s: 30}
+  - {command: {target_id: unit-ambulance-01, action: dispatch}, within_s: 45}
+  - {max_commands: {target_id: unit-ambulance-01, action: dispatch, count: 1}}
+  - {no_command: {target_id: unit-ambulance-02}}
+  - {command: {target_type: fire_truck, action: dispatch}, within_s: 45}
+  - {decision: {target_id: unit-ambulance-01}, within_s: 45}

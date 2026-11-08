@@ -1,0 +1,45 @@
+{
+  "additionalProperties": false,
+  "description": "brain/internal/quarantine/{device_id} (retained).",
+  "properties": {
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "timestamp": {
+      "title": "Timestamp",
+      "type": "string"
+    },
+    "correlation_id": {
+      "title": "Correlation Id",
+      "type": "string"
+    },
+    "device_id": {
+      "title": "Device Id",
+      "type": "string"
+    },
+    "state": {
+      "enum": [
+        "quarantined",
+        "released"
+      ],
+      "title": "State",
+      "type": "string"
+    },
+    "reason": {
+      "title": "Reason",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "timestamp",
+    "correlation_id",
+    "device_id",
+    "state",
+    "reason"
+  ],
+  "title": "InternalQuarantine",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

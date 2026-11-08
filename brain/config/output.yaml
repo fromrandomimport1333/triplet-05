@@ -1,0 +1,41 @@
+# Settings of the output module (python -m src.output): commands, acknowledgements, effect check.
+# The safety rules are in config/safety.yaml. Nothing here is hard-coded in src/output/.
+
+tick_s: 0.5                 # how often timeouts and effect checks are evaluated
+
+commands:
+  id_prefix: brain          # command ids: brain-000042
+  # auto: ids brain-<session>-000001 (session = start time, base 36): never reused across restarts
+  # or days (the Twin answers a reused id with the old acknowledgement). integer: brain-000042 style.
+  id_start: auto            # auto | integer
+  fill_dispatch_zone: true  # unit dispatch: parameters.zone_id = the incident zone
+
+acks:
+  timeout_s: 4              # the mock Twin acknowledges after ~2 s (2 ticks); real hardware may need more
+  retries: 1                # resend once with the SAME id, then failed + alert actuator_not_responding
+
+alerts:
+  on_rejected: true         # brain/alert command_rejected when the Twin rejects or fails a command
+
+# Effect check (team plan 05, section 5 point 5): after `done`, the readings of the zones the device
+# controls (a unit: the zone it was sent to) must move the expected way within window_s of the ack,
+# else the outcome becomes `failed` with detail `no_effect` (+ alert actuator_no_effect), so scoring
+# re-decides. "falls" = one reading at least the margin below the highest value since the command was
+# sent; "rises" = symmetric. margin = max(min_delta, min_rel x value when sent): keep it above the
+# sensor noise (mock: +-2 %). Actions without a matching entry are not checked.
+effects:
+  enabled: true
+  window_s: 30
+  checks:
+    - {kind: actuator, type: valve,          action: open,     metric: water_level,   expect: falls, min_delta: 0.12}
+    - {kind: actuator, type: power_grid,     action: shed,     metric: power_load,    expect: falls, min_rel: 0.05}
+    - {kind: actuator, type: traffic_signal, action: priority, metric: traffic_speed, expect: rises, min_delta: 3}
+    - {kind: unit,     type: fire_truck,     action: dispatch, metric: air_quality,   expect: falls, min_rel: 0.1}
+
+memory:
+  decision_ids_s: 3600      # a decision id is never executed twice within this time
+  finished_commands_s: 600  # late / duplicate acks of finished commands are ignored (and logged)
+
+logging:
+  file: logs/output.jsonl
+  level: INFO

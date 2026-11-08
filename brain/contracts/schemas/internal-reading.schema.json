@@ -1,0 +1,67 @@
+{
+  "additionalProperties": false,
+  "description": "brain/internal/reading.",
+  "properties": {
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "timestamp": {
+      "title": "Timestamp",
+      "type": "string"
+    },
+    "correlation_id": {
+      "title": "Correlation Id",
+      "type": "string"
+    },
+    "sensor_id": {
+      "title": "Sensor Id",
+      "type": "string"
+    },
+    "zone_id": {
+      "title": "Zone Id",
+      "type": "string"
+    },
+    "type": {
+      "title": "Type",
+      "type": "string"
+    },
+    "value": {
+      "title": "Value",
+      "type": "number"
+    },
+    "unit": {
+      "title": "Unit",
+      "type": "string"
+    },
+    "origin": {
+      "anyOf": [
+        {
+          "enum": [
+            "real",
+            "simulated"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Origin"
+    }
+  },
+  "required": [
+    "id",
+    "timestamp",
+    "correlation_id",
+    "sensor_id",
+    "zone_id",
+    "type",
+    "value",
+    "unit"
+  ],
+  "title": "InternalReading",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

@@ -1,0 +1,3 @@
+# Docker overlay: listen on every interface of the container, so the host browser reaches the screen.
+http:
+  host: 0.0.0.0

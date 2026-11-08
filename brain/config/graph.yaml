@@ -1,0 +1,62 @@
+# Settings of the graph module (team doc 02-graph, section 5). Nothing here is hard-coded in src/graph/.
+
+http:
+  host: 127.0.0.1             # context API, on the Brain host only
+  port: 8080                  # config/llm.yaml context.graph_url points here
+
+# Bounded memory: at most this many nodes per kind; the oldest is dropped (with its links).
+# City nodes (zone, sensor, actuator, unit) are never dropped.
+caps:
+  reading: 2000
+  verdict: 2000
+  call: 500
+  incident: 300
+  proposal: 600
+  decision: 300
+  action: 1000              # one node per action of a decision (its outcomes update it)
+  ack: 1000
+  quarantine: 200
+
+# Normal readings are not stored (02-graph 5.1). The last `pending` readings and verdicts are
+# kept in a ring, so that the one an incident or a rejection later points at can still be stored.
+pending: 5000
+
+# A reading is stored at once when it is at or beyond its sensor's alert level (else only when
+# a verdict rejects or suspects it, or an incident uses it as evidence).
+store_alert_readings: true
+
+context:
+  max_chars: 1500             # whole /context JSON (03-llm 4.1); lists are trimmed to fit
+  related_window_s: 900       # related events in the same and neighbouring zones, last 15 min
+  max_related: 8
+  max_evidence: 5
+  max_actuators: 8
+  max_units: 6
+  summary_chars: 60
+
+# Incident history (src/graph/history.py): a real storm as a reference for live incidents.
+# Built offline from the NYC 311 calls of Hurricane Ida 2021 by tools/build_history.py (port of
+# brain/notebooks/nyc311_ida_*.ipynb). /context gets a short `history` hint (dropped first if the
+# context is too long); /history serves the library. No network, no vector DB at run time.
+history:
+  enabled: true
+  file: data/history/nyc311-ida.json
+  types:                      # Brain incident type -> incident type in the library (others: no history)
+    flood: flood
+  severity_level:             # incident severity -> surge level of the library
+    low: small cluster
+    medium: busy period
+    high: heavy surge
+    critical: extreme surge
+  wave_share_min: 0.5         # mention the waves only when most past calls at that level were inside one
+  hint_chars: 260
+
+graph_view:
+  max_incidents: 20           # GET /graph: the city + the most recent incidents and what is linked to them
+
+chain:
+  max_items: 60               # GET /chain/{correlation_id}
+
+logging:
+  file: logs/graph.jsonl
+  level: INFO

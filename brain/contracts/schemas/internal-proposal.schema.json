@@ -1,0 +1,95 @@
+{
+  "$defs": {
+    "ProposalAction": {
+      "additionalProperties": false,
+      "properties": {
+        "target_id": {
+          "title": "Target Id",
+          "type": "string"
+        },
+        "action": {
+          "title": "Action",
+          "type": "string"
+        },
+        "params": {
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              }
+            ]
+          },
+          "default": {},
+          "title": "Params",
+          "type": "object"
+        }
+      },
+      "required": [
+        "target_id",
+        "action"
+      ],
+      "title": "ProposalAction",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "brain/internal/proposal: actions proposed for one incident (origin llm or rules).",
+  "properties": {
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "timestamp": {
+      "title": "Timestamp",
+      "type": "string"
+    },
+    "correlation_id": {
+      "title": "Correlation Id",
+      "type": "string"
+    },
+    "incident_id": {
+      "title": "Incident Id",
+      "type": "string"
+    },
+    "origin": {
+      "enum": [
+        "llm",
+        "rules"
+      ],
+      "title": "Origin",
+      "type": "string"
+    },
+    "actions": {
+      "items": {
+        "$ref": "#/$defs/ProposalAction"
+      },
+      "title": "Actions",
+      "type": "array"
+    },
+    "justification": {
+      "title": "Justification",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "timestamp",
+    "correlation_id",
+    "incident_id",
+    "origin",
+    "actions",
+    "justification"
+  ],
+  "title": "Proposal",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

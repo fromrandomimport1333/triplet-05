@@ -1,0 +1,113 @@
+{
+  "description": "guardian/verdict/{sensor_id} (GD-1 to GD-6). `suspect` is mapped to `suspicious` before.",
+  "properties": {
+    "id": {
+      "maxLength": 128,
+      "minLength": 1,
+      "title": "Id",
+      "type": "string"
+    },
+    "timestamp": {
+      "title": "Timestamp",
+      "type": "string"
+    },
+    "source": {
+      "enum": [
+        "twin",
+        "guardian",
+        "brain"
+      ],
+      "title": "Source",
+      "type": "string"
+    },
+    "correlation_id": {
+      "anyOf": [
+        {
+          "maxLength": 128,
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Correlation Id"
+    },
+    "seq": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Seq"
+    },
+    "sensor_id": {
+      "maxLength": 64,
+      "pattern": "^[a-z0-9][a-z0-9-]*$",
+      "title": "Sensor Id",
+      "type": "string"
+    },
+    "verdict": {
+      "enum": [
+        "trusted",
+        "suspicious",
+        "rejected"
+      ],
+      "title": "Verdict",
+      "type": "string"
+    },
+    "reason": {
+      "title": "Reason",
+      "type": "string"
+    },
+    "trust_score": {
+      "anyOf": [
+        {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "integer"
+            }
+          ],
+          "ge": 0,
+          "le": 1
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Trust Score"
+    },
+    "details": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Details"
+    }
+  },
+  "required": [
+    "id",
+    "timestamp",
+    "source",
+    "sensor_id",
+    "verdict",
+    "reason"
+  ],
+  "title": "VerdictBody",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

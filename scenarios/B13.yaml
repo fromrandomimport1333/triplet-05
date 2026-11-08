@@ -1,0 +1,27 @@
+id: B13
+name: Twin goes offline
+layers: [twin, guardian, brain]
+description: >
+  A flood starts at the port at 5 s; at 15 s the Twin goes down (status offline, no more readings
+  or acknowledgements) and comes back at 45 s. While the Twin is offline the Brain sends no new
+  command and the timeline shows the layer offline; it resumes when the Twin is back.
+trigger: python scenarios/run.py B13
+expected:
+  twin: twin/status offline at 15 s (control op offline), online again at 45 s with the city description.
+  guardian: Keeps its verdicts; nothing new to judge while the Twin is silent.
+  brain: Twin marked offline then online on the timeline; no command between 17 s and 45 s.
+how_to_verify: >
+  Timeline: twin offline -> (no commands) -> twin online. logs/B13-*.log: layer_offline / layer_online
+  events for twin, no brain/cmd line between those two times.
+duration_s: 65
+twin:
+  reset: {seed: 7, scenario: flood, scenario_zone: zone-01, scenario_after_ticks: 5}
+  actions:
+    - {at_s: 15, op: offline}
+    - {at_s: 45, op: online}
+guardian: {modes: [auto]}
+expect:
+  - {event: layer_offline, text: twin, after_s: 14, within_s: 20}
+  - {layer: twin, match: {status: offline}, after_s: 14, within_s: 20}
+  - {no_command: any, after_s: 17, within_s: 45}
+  - {event: layer_online, text: twin, after_s: 44, within_s: 55}

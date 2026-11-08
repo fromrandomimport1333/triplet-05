@@ -1,0 +1,37 @@
+# Topic ACL of the triplet broker: each layer writes only its own topics (SEC-4).
+# A layer that is compromised or misconfigured cannot impersonate another one on the bus;
+# the HMAC envelope then protects the content end to end.
+
+# --- City Brain: everything under brain/ (internal topics, commands, events, errors, status)
+user brain
+topic readwrite brain/#
+topic read twin/#
+topic read city/#
+topic read guardian/#
+
+# --- Twin: city readings and calls, its meta, actuator / unit acknowledgements, status
+user twin
+topic write city/#
+topic write twin/#
+topic read brain/cmd/#
+topic read brain/status
+topic read brain/error
+topic read twin/control
+
+# --- Guardian: verdicts, quarantines, status; reads the same data as the Brain
+user guardian
+topic write guardian/#
+topic read city/#
+topic read twin/#
+topic read brain/cmd/#
+topic read brain/alert
+topic read brain/status
+topic read brain/error
+topic read guardian/control
+
+# --- Scenario runner (tests only): drives the mocks, observes everything, writes nothing else
+user tester
+topic write twin/control
+topic write guardian/control
+topic write brain/control/#
+topic read #

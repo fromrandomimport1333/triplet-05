@@ -1,0 +1,168 @@
+{
+  "$defs": {
+    "DecisionAlternative": {
+      "additionalProperties": false,
+      "properties": {
+        "proposal_id": {
+          "title": "Proposal Id",
+          "type": "string"
+        },
+        "origin": {
+          "enum": [
+            "llm",
+            "rules"
+          ],
+          "title": "Origin",
+          "type": "string"
+        },
+        "score": {
+          "title": "Score",
+          "type": "number"
+        }
+      },
+      "required": [
+        "proposal_id",
+        "origin",
+        "score"
+      ],
+      "title": "DecisionAlternative",
+      "type": "object"
+    },
+    "ProposalAction": {
+      "additionalProperties": false,
+      "properties": {
+        "target_id": {
+          "title": "Target Id",
+          "type": "string"
+        },
+        "action": {
+          "title": "Action",
+          "type": "string"
+        },
+        "params": {
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              }
+            ]
+          },
+          "default": {},
+          "title": "Params",
+          "type": "object"
+        }
+      },
+      "required": [
+        "target_id",
+        "action"
+      ],
+      "title": "ProposalAction",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "brain/internal/decision: the actions chosen for an incident (team plan 04, section 6).",
+  "properties": {
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "timestamp": {
+      "title": "Timestamp",
+      "type": "string"
+    },
+    "correlation_id": {
+      "title": "Correlation Id",
+      "type": "string"
+    },
+    "incident_id": {
+      "title": "Incident Id",
+      "type": "string"
+    },
+    "chosen_proposal": {
+      "title": "Chosen Proposal",
+      "type": "string"
+    },
+    "origin": {
+      "enum": [
+        "llm",
+        "rules"
+      ],
+      "title": "Origin",
+      "type": "string"
+    },
+    "actions": {
+      "items": {
+        "$ref": "#/$defs/ProposalAction"
+      },
+      "title": "Actions",
+      "type": "array"
+    },
+    "score": {
+      "title": "Score",
+      "type": "number"
+    },
+    "alternatives": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/DecisionAlternative"
+      },
+      "title": "Alternatives",
+      "type": "array"
+    },
+    "risk": {
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "title": "Risk",
+      "type": "string"
+    },
+    "evidence_sensors": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Evidence Sensors",
+      "type": "array"
+    },
+    "mode": {
+      "enum": [
+        "normal",
+        "safe"
+      ],
+      "title": "Mode",
+      "type": "string"
+    },
+    "explanation": {
+      "title": "Explanation",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "timestamp",
+    "correlation_id",
+    "incident_id",
+    "chosen_proposal",
+    "origin",
+    "actions",
+    "score",
+    "risk",
+    "mode",
+    "explanation"
+  ],
+  "title": "Decision",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

@@ -1,0 +1,52 @@
+{
+  "additionalProperties": false,
+  "description": "brain/internal/layer-status/{layer} (retained).",
+  "properties": {
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "timestamp": {
+      "title": "Timestamp",
+      "type": "string"
+    },
+    "layer": {
+      "enum": [
+        "twin",
+        "guardian"
+      ],
+      "title": "Layer",
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "online",
+        "offline",
+        "degraded"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "reason": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Reason"
+    }
+  },
+  "required": [
+    "id",
+    "timestamp",
+    "layer",
+    "status"
+  ],
+  "title": "InternalLayerStatus",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

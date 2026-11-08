@@ -1,0 +1,35 @@
+id: B9
+name: Bad messages from the Twin
+layers: [twin, brain]
+description: >
+  The Twin sends one bad message of each kind on different sensors: no value, wrong HMAC, stamped
+  15 s in the past, duplicated, from an unknown sensor, an impossible value. The Brain refuses each
+  with its error code on brain/error and acts on none of them.
+trigger: python scenarios/run.py B9
+expected:
+  twin: Faults malformed (5 s), bad_hmac (8 s), duplicate (11 s), unknown_id (14 s), impossible (17 s), old by 15 s (20 s); everything else normal.
+  guardian: Not involved (bad readings are ignored, the impossible value rejects water-05).
+  brain: brain/error E_FORMAT, E_AUTH, E_REPLAY, E_UNKNOWN_ID, E_RANGE and E_STALE; no incident and no command.
+how_to_verify: >
+  Timeline: six input_rejected entries with their codes. logs/B9-*.log: six brain/error lines with
+  the codes above.
+duration_s: 35
+twin:
+  reset: {seed: 7, scenario: calm}
+  faults:
+    - {mode: malformed, tick: 5, device_id: water-02}
+    - {mode: bad_hmac, tick: 8, device_id: air-01}
+    - {mode: duplicate, tick: 11, device_id: traffic-flow-03}
+    - {mode: unknown_id, tick: 14, device_id: power-04}
+    - {mode: impossible, tick: 17, device_id: water-05}
+    - {mode: old, tick: 20, device_id: air-06, delay_ticks: 15}
+guardian: {modes: [auto]}
+expect:
+  - {error_code: E_FORMAT, within_s: 12}
+  - {error_code: E_AUTH, within_s: 15}
+  - {error_code: E_REPLAY, within_s: 18}
+  - {error_code: E_UNKNOWN_ID, within_s: 21}
+  - {error_code: E_RANGE, within_s: 24}
+  - {error_code: E_STALE, within_s: 27}
+  - {no_event: incident_opened}
+  - {no_command: any}

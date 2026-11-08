@@ -1,0 +1,32 @@
+id: B6
+name: Stuck valve
+layers: [twin, guardian, brain]
+description: >
+  Flood at the port; valve-01 is stuck: it acknowledges `done` but nothing changes. The Brain sees
+  no effect, marks the command failed, raises an alert and decides again without valve-01
+  (zone-01 has no other valve, so the new decision reports that no valve is usable).
+trigger: python scenarios/run.py B6
+expected:
+  twin: Flood in zone-01 from 5 s; valve-01 answers `done` but the water keeps rising.
+  guardian: water-01 trusted.
+  brain: Command valve-01 open, ack done, then outcome failed (no effect) and brain/alert actuator_no_effect; a new decision without valve-01; valve-01 never opened twice.
+how_to_verify: >
+  Timeline: command valve-01 -> ack -> no effect -> alert -> new decision. logs/B6-*.log: the alert
+  line for valve-01 and a second decision line, one valve-01 open command.
+duration_s: 90
+observe: {readings: [water-01]}
+twin:
+  reset: {seed: 7, scenario: flood, scenario_zone: zone-01, scenario_after_ticks: 5}
+  actuator_modes: {valve-01: stuck}
+guardian: {modes: [auto]}
+expect:
+  - {command: {target_id: valve-01, action: open}, within_s: 30}
+  - {ack: done, match: {actuator_id: valve-01}, within_s: 35}
+  - {alert: actuator_no_effect, match: {target_id: valve-01}, within_s: 80}
+  - {outcome: failed, match: {target_id: valve-01}, within_s: 80}
+  # deciding again without valve-01: a new decision if another action helps, else a reasoned skip
+  # (zone-01 has a single valve, so "no usable valve" is the expected answer here)
+  - any_of:
+      - {event: decision_changed, after_s: 20, within_s: 88}
+      - {event: decision_skipped, after_s: 20, within_s: 88}
+  - {max_commands: {target_id: valve-01, action: open, count: 1}}

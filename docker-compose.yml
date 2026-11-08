@@ -1,0 +1,45 @@
+# Starts the whole city with one command:  docker compose up
+#   (first time: cd brain && python tools/setup.py   -> certificates, keys, broker accounts)
+#
+#   broker   Mosquitto, TLS only (8883), one account per layer, topic ACL (brain/broker/)
+#   brain    every City Brain module + the mock Twin and mock Guardian (R1); timeline on
+#            http://localhost:8090. The LLM uses Ollama on the host (GPU); without it the rule
+#            fallback decides (python run.py --mock-llm for a scripted LLM).
+#
+# When the Twin and Guardian teams ship their layers, start them with the `real-layers` profile
+# and run the Brain without its mocks:  BRAIN_CMD="python run.py" docker compose --profile real-layers up
+
+services:
+  broker:
+    image: eclipse-mosquitto:2
+    ports: ["8883:8883"]
+    volumes:
+      - ./brain/broker:/mosquitto/config:ro
+      - ./brain/secrets/broker:/mosquitto/secrets:ro
+    restart: unless-stopped
+
+  brain:
+    build: ./brain
+    command: ${BRAIN_CMD:-python run.py --mocks}
+    depends_on: [broker]
+    environment:
+      BRAIN_CONFIG_OVERLAY: config/overlays/docker
+    volumes:
+      - ./brain/secrets:/app/brain/secrets:ro
+      - ./logs:/app/logs                       # R2: one log file per scenario run
+    ports:
+      - "8090:8090"                            # live timeline (R3)
+      - "8080:8080"                            # graph context API
+    extra_hosts:
+      - "host.docker.internal:host-gateway"    # Ollama on the host
+    restart: unless-stopped
+
+  # The other layers of the triplet (their teams' folders; each needs its Dockerfile).
+  twin:
+    build: ./twin
+    depends_on: [broker]
+    profiles: [real-layers]
+  guardian:
+    build: ./guardian
+    depends_on: [broker]
+    profiles: [real-layers]

@@ -1,0 +1,38 @@
+# The City Brain side in ONE container (broker + Brain + mocks + timeline), for integration:
+#
+#   docker compose -f docker-compose.city.yml up --build
+#
+# Then:  timeline http://localhost:8090   graph API http://localhost:8080/health
+#        scenarios from the host: python scenarios/run.py B2
+#
+# Partner layers connect to this machine on port 8883 (MQTT over TLS) with the files of
+# brain/secrets/ (created on the first start): ca.crt, their account password, their HMAC key.
+# As each real layer connects, stop mocking it:
+#
+#   BRAIN_MOCKS=guardian docker compose -f docker-compose.city.yml up    # real Twin, mock Guardian
+#   BRAIN_MOCKS=none     docker compose -f docker-compose.city.yml up    # both real layers
+#
+# BROKER_HOSTS=192.168.1.20  adds this laptop's LAN IP to the broker certificate (first start, or
+# delete brain/secrets/broker to regenerate). BRAIN_LLM=mock runs without Ollama / GPU.
+
+services:
+  city-brain:
+    build:
+      context: ./brain
+      dockerfile: Dockerfile.allinone
+    image: city-brain-allinone
+    user: "${HOST_UID:-1000}:${HOST_GID:-1000}"     # the host user: it owns brain/secrets and logs/
+    environment:
+      BRAIN_MOCKS: ${BRAIN_MOCKS:-twin,guardian}
+      BRAIN_LLM: ${BRAIN_LLM:-ollama}
+      BROKER_HOSTS: ${BROKER_HOSTS:-}
+    volumes:
+      - ./brain/secrets:/app/brain/secrets          # shared with the partner teams (never committed)
+      - ./logs:/app/logs                            # R2: one log file per scenario run
+    ports:
+      - "8883:8883"                                 # MQTT over TLS: Twin, Guardian, scenario runner
+      - "127.0.0.1:8090:8090"                       # live timeline (R3), this laptop only
+      - "127.0.0.1:8080:8080"                       # graph API: no authentication, this laptop only
+    extra_hosts:
+      - "host.docker.internal:host-gateway"         # Ollama on the host
+    restart: unless-stopped

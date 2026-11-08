@@ -1,0 +1,30 @@
+id: B3
+name: Fake flood at the port (Guardian rejects the sensor)
+layers: [twin, guardian, brain]
+description: >
+  Organizer example T5. From 10 s the port sensor water-01 reports 1.8 m while the real level stays
+  at 0.4 m (Twin fault `falsify`). Guardian sees an implausible jump, marks the sensor rejected
+  within 10 s and isolates it. The Brain does not open the valve and records why.
+trigger: python scenarios/run.py B3
+expected:
+  twin: water-01 reports 1.8 m from 10 s to 40 s (the other sensors, and the truth, stay normal).
+  guardian: Verdict `rejected` (implausible_jump) on water-01 at the first fake reading (< 10 s), quarantine notice for water-01.
+  brain: No flood incident acted on and no valve command; the timeline shows water-01 quarantined by Guardian and why.
+how_to_verify: >
+  Timeline: water-01 = 1.8 m -> Guardian rejected (implausible_jump) -> water-01 quarantined ->
+  no command. logs/B3-*.log: the verdict line (t < 20 s), no brain/cmd/valve-* line, PASS summary.
+duration_s: 45
+observe: {readings: [water-01]}
+twin:
+  reset: {seed: 7, scenario: calm}
+  faults:
+    - {mode: falsify, tick: 10, end_tick: 40, device_id: water-01, value: 1.8}
+guardian: {modes: [auto]}
+expect:
+  - {reading: water-01, match: {value: 1.8}, within_s: 15}
+  - {verdict: rejected, match: {sensor_id: water-01, reason: implausible_jump}, after_s: 9, within_s: 20}
+  - {quarantine: quarantined, match: {device_id: water-01}, within_s: 20}
+  - {event: device_quarantined, text: water-01, within_s: 22}
+  - {no_command: {target_type: valve}}
+  - {no_event: incident_opened, match: {zone_id: zone-01, type: flood}}
+  - {no_outcome: acknowledged, match: {target_type: valve}}

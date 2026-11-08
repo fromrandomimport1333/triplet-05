@@ -1,0 +1,142 @@
+# Settings of the detection module (team doc 02-graph, section 4). Nothing here is hard-coded
+# in src/detection/. Zones, sensors, alert levels and neighbours come from brain/internal/meta.
+
+# --- Step 1: is this sensor abnormal? ---------------------------------------------------
+sensor:
+  smoothing: 0.05            # EWMA weight of a new reading (mean and variance)
+  warmup_readings: 20        # readings before z-scores are trusted (the alert level works at once)
+  z_far: 3.0                 # |z| above this, in the bad direction = a "bad" reading
+  z_clear: 2.0               # |z| below this = a "good" reading again (hysteresis)
+  z_full: 6.0                # z at which a z-only signal has full strength (strength = z / z_full)
+  consecutive: 3             # bad readings in a row to become abnormal, good ones to become normal
+  alert_clear_ratio: 0.9     # an alert-level sensor is "good" again below alert x this ratio
+  min_rel_std: 0.01          # std floor, as a fraction of |mean| (noise-free sensors)
+  min_abs_std: 0.001         # std floor in the sensor's unit
+  stale_s: 10                # a sensor silent for longer stops counting
+  relearn_after_s: 900       # readings kept out of the baseline this long in a row (not at alert) are learned again
+  history: 12                # recent readings kept per sensor (rising / sudden drop)
+  # bad direction per sensor type: up | down | either
+  direction:
+    water_level: up
+    air_quality: up
+    power_load: up
+    traffic_density: up
+    traffic_speed: down
+    traffic_flow: down
+    smoke: up
+    co: up
+    co2: up
+    temperature: up
+  default_direction: either
+  rising:
+    window: 5                # readings compared (newest vs oldest of the window)
+    min_rise_frac: 0.05      # rise needed, as a fraction of the oldest value (or of the alert level)
+  sudden_drop:
+    drop_frac: 0.5           # value at least 50 % below the baseline mean ...
+    within_s: 10             # ... reached within this many seconds of the first bad reading
+
+# --- Step 2: combine signals per zone ----------------------------------------------------
+# A source is one sensor, or all recent calls of one category in the zone (B7: ten calls = one source).
+# p_i = min(cap_i, weight_i x strength_i x trust_i); confidence = 1 - prod(1 - p_i).
+# strength: 1.0 at alert level, else min(1, z / z_full); calls: min(1, count / full_count).
+# Support signals (and neighbouring zones) only count when a primary signal is present.
+combine:
+  cap_single: 0.6            # a single reading source never exceeds this ...
+  cap_alert: 0.95            # ... unless it is at alert level for `consecutive` readings
+  neighbour_factor: 0.3      # weight factor of the same sensor type in a neighbouring zone (support)
+  min_source: 0.05           # p below this is not counted as a source (evidence, severity)
+  max_evidence: 6            # evidence entries in an incident message
+calls:
+  window_s: 120              # calls older than this no longer count
+  full_count: 3              # calls of one category in the zone for full strength
+  cap: 0.55                  # calls alone stay a low-confidence incident (B7)
+  trust: 1.0                 # calls are not checked by Guardian
+  max_evidence: 3            # newest calls listed as evidence
+  superseded_by_recovery: true   # calls made before a live, trusted sensor reported the zone normal again no longer count
+  # Per call category, replacing window_s / full_count. Flood: calibrated on 5,613 NYC 311 flood calls
+  # during Hurricane Ida (python tools/calibrate_calls.py): on the storm night, calls from one ~1 km area
+  # came a median 19 min apart; within an hour of the first, 51 % of flooded areas had a second call and
+  # 29 % a third; 3 calls within 2 min happened 21 times in 536 areas. So a flood call counts for an hour and two callers
+  # are full strength. Still ONE source capped at `cap` (B7), and a newer trusted reading that says the
+  # zone is back to normal still cancels it (superseded_by_recovery).
+  by_category:
+    flood: {window_s: 3600, full_count: 2}
+
+incidents:
+  flood:
+    sensors:
+      water_level: {weight: 0.9, role: primary, require_rising: true}   # rising needed to open, not to stay open
+    calls: {flood: 0.6}
+    neighbours: [water_level]
+  fire:
+    sensors:
+      air_quality: {weight: 0.85, role: primary}
+      power_load: {weight: 0.3, role: support}
+    calls: {fire: 0.6}
+    neighbours: [air_quality]
+    # case memory (src/memory, config/memory.yaml): a fresh verdict for the zone with at least
+    # min_share of the votes. fire = a support source of fire_weight x share; nuisance (cooking) =
+    # the zone's reading sources x nuisance_factor (calls still count in full).
+    # wait_s: readings alone (no call) in a zone with a wait_for sensor wait this long for a verdict.
+    memory: {fire_weight: 0.5, nuisance_factor: 0.2, min_share: 0.6, max_age_s: 20,
+             wait_s: 25, wait_for: [smoke, co]}
+  accident:
+    sensors:
+      traffic_speed: {weight: 0.45, role: primary, require_sudden: true}
+      traffic_density: {weight: 0.2, role: support}
+    calls: {accident: 0.6}
+    neighbours: []
+    max_without_call: 0.45   # a speed drop alone is ambiguous (jam or accident): needs a call to open
+  traffic_jam:
+    sensors:
+      traffic_speed: {weight: 0.7, role: primary, min_abnormal_s: 20, min_drop_frac: 0.3, citywide_check: true}
+      traffic_density: {weight: 0.4, role: support}
+      traffic_flow: {weight: 0.3, role: support}
+    calls: {}
+    neighbours: []
+    suppressed_by: [accident]          # same zone: the jam is the accident's queue
+  power_problem:
+    sensors:
+      power_load: {weight: 0.8, role: primary}
+    calls: {}
+    neighbours: []
+    suppressed_by: [fire]              # "power abnormal with no matching fire"
+    suppress_in_neighbours: true
+
+# Rush hour = most zones degraded together: not a jam (scenario B1).
+citywide:
+  sensor_type: traffic_speed
+  fraction: 0.5              # this share of zones (with such a sensor) abnormal at once = city-wide pattern
+  outlier_ratio: 0.5         # during a city-wide pattern a zone is still jammed if its speed < median x this
+  hold_s: 120                # the pattern is kept this long after it fades (zones recover one by one)
+
+# --- Step 3: Guardian's trust (02-graph 4.3) ---------------------------------------------
+trust:
+  trusted_default: 1.0
+  suspicious_default: 0.3
+  rejected: 0.0
+  no_verdict: 0.6            # also used for every sensor while Guardian is offline -> verified: false
+
+# --- Step 4: lifecycle ---------------------------------------------------------------------
+lifecycle:
+  open_threshold: 0.5
+  open_checks: 2             # checks in a row at or above open_threshold
+  close_threshold: 0.25
+  reset_on_twin_restart: true   # Twin back online after offline: close incidents, forget calls and sensor episodes
+  close_checks: 2            # checks in a row below close_threshold (or with all evidence stale)
+  min_update_interval_s: 5   # at most one `updated` per incident in this time
+  downgrade_after_s: 15      # a lower severity must last this long before it is published
+  tick_s: 1.0
+
+severity:
+  medium_confidence: 0.6     # below: low
+  high_confidence: 0.75      # with high_sources agreeing sources: high
+  high_sources: 2
+  high_margin: 0.5           # (value - alert) / alert at or above this: high
+  critical_confidence: 0.9   # critical needs all three: confidence, sources and margin
+  critical_sources: 3
+  critical_margin: 0.5
+
+logging:
+  file: logs/detection.jsonl
+  level: INFO

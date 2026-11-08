@@ -1,0 +1,7 @@
+#!/bin/sh
+# ./scenarios/run B3   (same arguments as scenarios/run.py)
+here="$(cd "$(dirname "$0")" && pwd)"
+py="$here/../brain/.venv/bin/python"
+[ -x "$py" ] || py="$here/../brain/.venv/Scripts/python.exe"
+[ -x "$py" ] || py="$(command -v python3 || command -v python)"
+exec "$py" "$here/run.py" "$@"

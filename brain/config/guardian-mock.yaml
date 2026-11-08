@@ -1,0 +1,72 @@
+# Settings of the Guardian mock (python -m mocks.guardian). It stands in for the real Guardian so the
+# Brain can be developed and tested alone. Topic names come from topics.yaml (external_in, source
+# guardian), the HMAC key guardian-brain from security.yaml, the broker address from broker.yaml.
+
+client_id: guardian-mock
+auth:                                   # broker account of the Guardian (the Brain uses its own)
+  username: guardian
+  password_file: secrets/guardian-password.txt   # empty or missing file = no password
+
+topics:
+  control: guardian/control             # test control, sealed with the guardian-brain key
+
+city: mocks/city.yaml        # sensors known before twin/meta arrives (relative to brain/)
+verify_twin_hmac: true       # check readings with the twin-brain key when present (mock shortcut: the
+                             # real Guardian reads the Twin with its own key)
+envelope: hmac               # hmac: {"hmac": ...} | hmacs: {"hmacs": {"brain": ...}}
+
+# Modes applied at start, in order (team plan 06, section 5). A `mode` control message changes them:
+#   auto (the checks below, default) | trust_all (every sensor trusted, 0.95)
+#   reject:<sensor_id> | suspicious:<sensor_id> (0.5) | flip_flop[:<sensor_id>] | clear:<sensor_id>
+#   quarantine:<device_id> | release:<device_id>
+#   slow (verdicts slow_s late) | fast | offline (status offline, then silent) | online
+modes: [auto]
+
+tick_s: 1                    # expected time between two readings of a sensor (the Twin's tick)
+refresh_s: 5                 # an unchanged verdict is published again after this long (Brain: offline after 30 s of silence)
+slow_s: 5                    # `slow` mode delay
+
+# A sensor rejected by the checks for one of these reasons is also isolated (guardian/quarantine,
+# state quarantined), and released after auto_release_after trusted readings in a row (0 = never).
+isolate_on_reject: true
+isolate_reasons: [implausible_jump]
+auto_release_after: 5
+
+trust:                       # trust_score per verdict
+  trusted: 0.95
+  trust_all: 0.95
+  suspicious: 0.5
+  rejected: 0.05
+  baseline_penalty: 0.05     # trusted, but far from the sensor's own baseline
+
+forced_reasons:              # `reason` of the forced modes
+  reject: out_of_range
+  suspicious: inconsistent
+  quarantine: forced
+  release: forced
+
+checks:
+  # Largest believable change per tick, per sensor type (a number, or {rise, fall}). The Twin mock's
+  # scenarios move in steps (flood: 0.4 -> 1.4 m, back to 0.4 m when it ends; fire: air 12 -> 250
+  # ug/m3; accident: density 30 -> 160), which must pass; the fake flood of T5 (0.4 -> 1.8 m) must not.
+  max_step:
+    water_level: {rise: 1.2, fall: 2.5}
+    traffic_speed: 60
+    traffic_density: 200
+    traffic_flow: 100
+    power_load: 600
+    air_quality: 400
+    smoke: 15                # %/ft: a burnt toast jumps by ~3.5 at once (NIST), a real fire climbs
+    co: 100
+    co2: 3000
+    temperature: 15
+  # After a rejected jump the sensor stays rejected until its value comes back near the last trusted level.
+  # rebase_n > 0 would accept a new level held that many readings with noise; off, because a forged
+  # reading with realistic noise (T5) looks exactly like that, and every real scenario step is within max_step.
+  rebase_n: 0
+  frozen_suspicious_n: 5     # same value this many readings in a row -> suspicious
+  frozen_rejected_n: 10      # ... -> rejected
+  flatline_n: 5              # pinned at the sensor's min or max this many readings -> rejected
+  baseline_alpha: 0.05       # per-sensor baseline (EWMA of trusted values)
+  baseline_min_n: 10
+  baseline_z: 6

@@ -1,0 +1,10 @@
+.venv
+secrets
+logs
+**/__pycache__
+**/*.pyc
+.pytest_cache
+.hypothesis
+build
+dist
+*.egg-info

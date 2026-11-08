@@ -1,0 +1,110 @@
+{
+  "additionalProperties": false,
+  "description": "brain/internal/ack: Twin acknowledgement, actuator state or unit state.\n\ncorrelation_id = the Brain command id this acknowledges (result set),\nor the Twin message id for a plain state update (result absent).",
+  "properties": {
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "timestamp": {
+      "title": "Timestamp",
+      "type": "string"
+    },
+    "correlation_id": {
+      "title": "Correlation Id",
+      "type": "string"
+    },
+    "message_id": {
+      "title": "Message Id",
+      "type": "string"
+    },
+    "kind": {
+      "enum": [
+        "actuator",
+        "unit"
+      ],
+      "title": "Kind",
+      "type": "string"
+    },
+    "target_id": {
+      "title": "Target Id",
+      "type": "string"
+    },
+    "result": {
+      "anyOf": [
+        {
+          "enum": [
+            "done",
+            "rejected",
+            "failed"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Result"
+    },
+    "state": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "State"
+    },
+    "status": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Status"
+    },
+    "zone_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Zone Id"
+    },
+    "reason": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Reason"
+    }
+  },
+  "required": [
+    "id",
+    "timestamp",
+    "correlation_id",
+    "message_id",
+    "kind",
+    "target_id"
+  ],
+  "title": "InternalAck",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

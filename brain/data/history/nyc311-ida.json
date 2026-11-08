@@ -1,0 +1,151 @@
+{
+ "source": "nyc311-ida",
+ "title": "NYC 311 calls, Hurricane Ida (31 Aug - 3 Sep 2021)",
+ "built_from": "311_ida.csv",
+ "built_by": "brain/tools/build_history.py (port of brain/notebooks/nyc311_ida_*.ipynb)",
+ "calls": 6273,
+ "period": [
+  "2021-08-31T00:19:00-04:00",
+  "2021-09-03T23:55:00-04:00"
+ ],
+ "surge_levels": [
+  {
+   "max_similar_60m": 4,
+   "label": "isolated report"
+  },
+  {
+   "max_similar_60m": 29,
+   "label": "small cluster"
+  },
+  {
+   "max_similar_60m": 99,
+   "label": "busy period"
+  },
+  {
+   "max_similar_60m": 299,
+   "label": "heavy surge"
+  },
+  {
+   "max_similar_60m": null,
+   "label": "extreme surge"
+  }
+ ],
+ "wave_rule": {
+  "busy_hour_min_flood_calls": 50,
+  "merge_gap_h": 2
+ },
+ "baseline": {
+  "flood_calls_per_h_before_storm": 4.8,
+  "flood_calls_per_h_peak": 659
+ },
+ "waves": [
+  {
+   "id": "E1",
+   "start": "2021-09-01T20:00:00-04:00",
+   "end": "2021-09-02T03:00:00-04:00",
+   "hours": 7,
+   "peak_calls_per_h": 659,
+   "peak_hour": "2021-09-01T22:00:00-04:00",
+   "flood_calls": 2121,
+   "top_borough": "Queens"
+  },
+  {
+   "id": "E2",
+   "start": "2021-09-02T06:00:00-04:00",
+   "end": "2021-09-02T21:00:00-04:00",
+   "hours": 15,
+   "peak_calls_per_h": 311,
+   "peak_hour": "2021-09-02T09:00:00-04:00",
+   "flood_calls": 2284,
+   "top_borough": "Queens"
+  },
+  {
+   "id": "E3",
+   "start": "2021-09-03T09:00:00-04:00",
+   "end": "2021-09-03T16:00:00-04:00",
+   "hours": 7,
+   "peak_calls_per_h": 101,
+   "peak_hour": "2021-09-03T11:00:00-04:00",
+   "flood_calls": 530,
+   "top_borough": "Queens"
+  }
+ ],
+ "co_surge": [
+  {
+   "when": "flood",
+   "also_rises": "traffic_signal_failure",
+   "per_hour_in_waves": 15.93,
+   "per_hour_outside": 2.96,
+   "ratio": 5.4
+  }
+ ],
+ "types": {
+  "flood": {
+   "calls": 5613,
+   "call_types": {
+    "Sewer backup": 4030,
+    "Street flooding": 767,
+    "Clogged catch basin": 644,
+    "Water in basement": 172
+   },
+   "levels": {
+    "isolated report": {
+     "calls": 55,
+     "share_in_wave": 0.0,
+     "median_similar_60m": 2,
+     "storm_night_share": 0.0
+    },
+    "small cluster": {
+     "calls": 354,
+     "share_in_wave": 0.03,
+     "median_similar_60m": 14,
+     "storm_night_share": 0.17
+    },
+    "busy period": {
+     "calls": 1269,
+     "share_in_wave": 0.78,
+     "median_similar_60m": 68,
+     "storm_night_share": 0.18
+    },
+    "heavy surge": {
+     "calls": 2200,
+     "share_in_wave": 1.0,
+     "median_similar_60m": 207,
+     "storm_night_share": 0.18
+    },
+    "extreme surge": {
+     "calls": 1735,
+     "share_in_wave": 1.0,
+     "median_similar_60m": 519,
+     "storm_night_share": 0.91
+    }
+   }
+  },
+  "traffic_signal_failure": {
+   "calls": 660,
+   "call_types": {
+    "Traffic signal failure": 660
+   },
+   "levels": {
+    "isolated report": {
+     "calls": 124,
+     "share_in_wave": 0.2,
+     "median_similar_60m": 2,
+     "storm_night_share": 0.03
+    },
+    "small cluster": {
+     "calls": 352,
+     "share_in_wave": 0.72,
+     "median_similar_60m": 15,
+     "storm_night_share": 0.41
+    },
+    "busy period": {
+     "calls": 184,
+     "share_in_wave": 1.0,
+     "median_similar_60m": 47,
+     "storm_night_share": 0.43
+    }
+   }
+  }
+ }
+}

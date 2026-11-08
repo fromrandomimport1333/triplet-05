@@ -1,0 +1,55 @@
+# The mock city (python -m mocks.twin): zones, sensors, actuators and response units of the Twin mock.
+# What the input module learns from `twin/meta`. Edit this file to change the city; nothing about it is
+# hard-coded in mocks/twin/. Ids must match [a-z0-9-]+.
+
+# One sensor of each type is made for every zone listed in `sensors` (default: all types, except a type
+# with `zones`, made only in those). The sensor id is
+# <prefix>-<NN>, where NN is the number of the zone (zone-03 -> traffic-speed-03).
+# baseline = calm-day value; the mock adds noise (sim.noise) and scenario / command effects.
+sensor_types:
+  traffic_speed:   {prefix: traffic-speed,   unit: km/h,         min: 0, max: 200,  baseline: 45}
+  traffic_density: {prefix: traffic-density, unit: vehicles/km,  min: 0, max: 300,  baseline: 30,  alert: 150}
+  traffic_flow:    {prefix: traffic-flow,    unit: vehicles/min, min: 0, max: 300,  baseline: 25}
+  water_level:     {prefix: water,           unit: m,            min: 0, max: 5,    baseline: 0.4, alert: 1.3}
+  power_load:      {prefix: power,           unit: kW,           min: 0, max: 2000, baseline: 500}
+  air_quality:     {prefix: air,             unit: ug/m3,        min: 0, max: 1000, baseline: 12,  alert: 150}
+  # Fire signature (the case memory, src/memory): only where fires and kitchens are, so the other
+  # zones keep their message rate. noise_abs = absolute noise in the unit (a flat 0 would look frozen
+  # to Guardian). The fire and cooking scenarios replay held-out NIST tests (twin/traces/).
+  smoke:           {prefix: smoke, unit: "%/ft", min: 0, max: 40,    baseline: 0.05, noise_abs: 0.01, zones: [zone-05, zone-06]}
+  co:              {prefix: co,    unit: ppm,    min: 0, max: 1000,  baseline: 3,    noise_abs: 0.3,  zones: [zone-05, zone-06]}
+  co2:             {prefix: co2,   unit: ppm,    min: 0, max: 20000, baseline: 450,  noise_abs: 5,    zones: [zone-05, zone-06]}
+  temperature:     {prefix: temp,  unit: C,      min: -20, max: 200, baseline: 22,   noise_abs: 0.1,  zones: [zone-05, zone-06]}
+
+# Six zones (team plan 06, section 4). zone-01 keeps the ids of the first single-zone mock.
+zones:
+  - {zone_id: zone-01, name: Port,                       type: port,        exposure: high,   adjacent: [zone-02]}
+  - {zone_id: zone-02, name: Docks,                      type: port,        exposure: high,   adjacent: [zone-01, zone-03]}
+  - {zone_id: zone-03, name: Centre,                     type: commercial,  exposure: medium, adjacent: [zone-02, zone-04, zone-05, zone-06]}
+  - {zone_id: zone-04, name: Hospital zone,              type: medical,     exposure: low,    adjacent: [zone-03, zone-06]}
+  - {zone_id: zone-05, name: Industrial (substation),    type: industrial,  exposure: medium, adjacent: [zone-03, zone-06]}
+  - {zone_id: zone-06, name: Residential,                type: residential, exposure: medium, adjacent: [zone-03, zone-04, zone-05]}
+
+# controls = the zones whose readings the actuator changes
+actuators:
+  - {actuator_id: valve-01,  type: valve,          zone_id: zone-01, controls: [zone-01], actions: [open, close]}
+  - {actuator_id: valve-02,  type: valve,          zone_id: zone-02, controls: [zone-02], actions: [open, close]}
+  - {actuator_id: valve-03,  type: valve,          zone_id: zone-05, controls: [zone-05], actions: [open, close]}
+  - {actuator_id: signal-01, type: traffic_signal, zone_id: zone-01, controls: [zone-01], actions: [normal, priority]}
+  - {actuator_id: signal-02, type: traffic_signal, zone_id: zone-02, controls: [zone-02], actions: [normal, priority]}
+  - {actuator_id: signal-03, type: traffic_signal, zone_id: zone-03, controls: [zone-03], actions: [normal, priority]}
+  - {actuator_id: signal-07, type: traffic_signal, zone_id: zone-03, controls: [zone-03], actions: [normal, priority]}
+  - {actuator_id: signal-04, type: traffic_signal, zone_id: zone-04, controls: [zone-04], actions: [normal, priority]}
+  - {actuator_id: signal-05, type: traffic_signal, zone_id: zone-05, controls: [zone-05], actions: [normal, priority]}
+  - {actuator_id: signal-06, type: traffic_signal, zone_id: zone-06, controls: [zone-06], actions: [normal, priority]}
+  - {actuator_id: grid-01,   type: power_grid,     zone_id: zone-05, controls: [zone-05, zone-06], actions: [normal, shed]}
+  - {actuator_id: grid-02,   type: power_grid,     zone_id: zone-03, controls: [zone-03, zone-04], actions: [normal, shed]}
+
+# home_zone = where the unit starts and returns to; `dispatch` sends it to the zone in its parameters
+units:
+  - {unit_id: unit-ambulance-01, type: ambulance,  home_zone: zone-04}
+  - {unit_id: unit-ambulance-02, type: ambulance,  home_zone: zone-03}
+  - {unit_id: unit-fire-01,      type: fire_truck, home_zone: zone-05}
+  - {unit_id: unit-fire-02,      type: fire_truck, home_zone: zone-01}
+  - {unit_id: unit-police-01,    type: police,     home_zone: zone-03}
+  - {unit_id: unit-rescue-01,    type: rescue,     home_zone: zone-02}

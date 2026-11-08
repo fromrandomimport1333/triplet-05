@@ -1,0 +1,43 @@
+# Rule fallback (team plan 04, section 4): the standard actions per incident type.
+# Read by src/rules/. Nothing about devices is hard-coded: templates name a target TYPE
+# (actuator type or unit type from twin/meta) and are resolved against brain/internal/meta
+# when an incident opens or changes. Quarantined devices, busy units and targets that already
+# failed for the incident are never used.
+#
+# Template fields:
+#   target        actuator type (valve, traffic_signal, power_grid) or unit type (ambulance, ...)
+#   action        action to send; must be in the actuator's `actions` (meta) or in unit_actions
+#   params        command parameters; string values may use {zone_id} and {incident_id}
+#   select        how the devices are found:
+#                   controls_zone  actuators of that type whose `controls` list the incident zone
+#                   in_zone        actuators of that type located in, or controlling, the incident zone
+#                   nearest_free   one unit of that type: the nearest free one (zone hops), see
+#                                  scoring.yaml `units` for busy units and pre-emption
+#   max           at most this many devices from one template (default: all for actuators, 1 for units)
+#   min_severity  only from this severity up (low < medium < high < critical)
+
+# Units have no `actions` list in twin/meta: what they accept (mock Twin: dispatch, recall).
+unit_actions: [dispatch, recall]
+# The dispatch action and the parameter that carries the destination zone. A dispatch without
+# this parameter gets the incident zone (Decision contract).
+unit_dispatch: {action: dispatch, recall: recall, zone_param: zone_id}
+
+max_justification_chars: 300
+
+incidents:
+  flood:
+    - {target: valve,          action: open,     params: {opening: 1.0}, select: controls_zone}
+    - {target: traffic_signal, action: priority, select: in_zone}                     # clear the way
+    - {target: rescue,         action: dispatch, params: {zone_id: "{zone_id}"}, select: nearest_free, min_severity: high}
+  fire:
+    - {target: fire_truck,     action: dispatch, params: {zone_id: "{zone_id}"}, select: nearest_free}
+    - {target: traffic_signal, action: priority, select: in_zone}
+    - {target: ambulance,      action: dispatch, params: {zone_id: "{zone_id}"}, select: nearest_free, min_severity: high}
+  accident:
+    - {target: ambulance,      action: dispatch, params: {zone_id: "{zone_id}"}, select: nearest_free}
+    - {target: traffic_signal, action: priority, select: in_zone}
+    - {target: police,         action: dispatch, params: {zone_id: "{zone_id}"}, select: nearest_free, min_severity: high}
+  traffic_jam:
+    - {target: traffic_signal, action: priority, select: in_zone}
+  power_problem:
+    - {target: power_grid,     action: shed,     select: controls_zone}

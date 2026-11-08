@@ -1,0 +1,53 @@
+{
+  "additionalProperties": false,
+  "description": "brain/internal/call.",
+  "properties": {
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "timestamp": {
+      "title": "Timestamp",
+      "type": "string"
+    },
+    "correlation_id": {
+      "title": "Correlation Id",
+      "type": "string"
+    },
+    "call_id": {
+      "title": "Call Id",
+      "type": "string"
+    },
+    "zone_id": {
+      "title": "Zone Id",
+      "type": "string"
+    },
+    "category": {
+      "title": "Category",
+      "type": "string"
+    },
+    "text": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Text"
+    }
+  },
+  "required": [
+    "id",
+    "timestamp",
+    "correlation_id",
+    "call_id",
+    "zone_id",
+    "category"
+  ],
+  "title": "InternalCall",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

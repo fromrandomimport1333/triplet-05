@@ -1,0 +1,34 @@
+# The whole City Brain side in ONE container, for integration with the other layers:
+#   MQTT broker (Mosquitto, TLS 8883, accounts + ACL) + every Brain module + mock Twin and mock
+#   Guardian (switch each one off when the real layer connects) + live timeline (8090) + graph
+#   context API (8080). Started by docker-compose.city.yml at the repo root (see its header).
+FROM python:3.12-slim
+
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends mosquitto \
+ && rm -rf /var/lib/apt/lists/*
+
+ENV PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1 PYTHONIOENCODING=utf-8
+WORKDIR /app/brain
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+# mosquitto.conf reads /mosquitto/config (ACL) and /mosquitto/secrets (certificates, passwords),
+# the paths of the separate broker container: point them at the brain folders.
+# Writable folders are open to any user: compose runs the container as the host user, who owns
+# the mounted brain/secrets and logs/.
+RUN useradd --create-home --uid 10001 brain \
+ && mkdir -p /app/logs logs secrets /mosquitto \
+ && ln -s /app/brain/broker /mosquitto/config \
+ && ln -s /app/brain/secrets/broker /mosquitto/secrets \
+ && chown -R brain /app/logs logs secrets \
+ && chmod -R a+rwX /app/logs logs secrets
+USER brain
+
+ENV BRAIN_CONFIG_OVERLAY=config/overlays/allinone \
+    BRAIN_MOCKS=twin,guardian \
+    BRAIN_LLM=ollama
+EXPOSE 8883 8090 8080
+ENTRYPOINT ["/app/brain/tools/allinone.sh"]

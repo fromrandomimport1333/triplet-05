@@ -1,0 +1,41 @@
+# Settings of the case memory (python -m src.memory): "which past cases look like this moment?"
+# Nothing here is hard-coded in src/memory/. Built from vector-storage/ (dataset studies) by
+# tools/build_cases.py; same features, scales and vote as the NIST notebook, offline and in memory.
+
+library:
+  file: data/cases/nist_fire_windows.csv   # relative to brain/
+  name: NIST smoke alarm tests (TN 1947)
+  include_holdout: false    # test group 5 stays out: it is what the mock Twin replays (unseen cases)
+  incident_type: fire       # the incident type these cases are about
+
+# The library's 7 features, in its units. `signals` maps each measured column to a sensor type of
+# twin/meta and the factor from the sensor's unit to the library's unit. A zone is assessed only
+# when it has a sensor of every `required` type (without CO, fire and cooking cannot be told apart).
+features: [obsc, obsc_slope, co, co_slope, co2, tc, tc_slope]
+scales: [0.5, 0.005, 5.0, 0.05, 0.02, 2.0, 0.02]   # signed log of value / scale (notebook section 3)
+signals:
+  obsc: {type: smoke,       factor: 1.0}      # smoke obscuration, %/ft
+  co:   {type: co,          factor: 1.0}      # ppm
+  co2:  {type: co2,         factor: 0.0001}   # sensor in ppm -> library in vol %
+  tc:   {type: temperature, factor: 1.0}      # ceiling temperature, deg C
+required: [obsc, co]
+
+window_s: 60                # one case = the last 60 s, one value per second
+min_samples: 20             # seconds with data in the window before a lookup
+baseline:                   # "normal" per sensor: a low quantile of its recent readings
+  window_s: 600
+  quantile: 0.1
+  min_samples: 10
+k: 15                       # neighbours that vote
+min_share: 0.6              # a verdict needs this share of the votes; below, the previous verdict stands
+falling_slope: 0.005        # smoke falling faster than this (%/ft per s) never starts a verdict (end of an episode)
+quiet:                      # below all of these the zone is quiet: no lookup, nothing to say
+  obsc: 0.1
+  co: 2.0
+  tc: 2.0
+every_s: 5                  # lookup per zone at most this often
+repeat_s: 15                # a non-quiet verdict is published again this often (consumers keep it fresh)
+
+logging:
+  file: logs/memory.jsonl
+  level: INFO

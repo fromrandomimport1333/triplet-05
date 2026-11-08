@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "citybrain-mcp-server"
+version = "1.1.0"
+description = "Read-only MCP server exposing citybrain's evidence fusion, change detection, correlation-graph, and decision queries."
+requires-python = ">=3.9"
+dependencies = ["citybrain", "mcp>=1.2"]
+
+[project.scripts]
+citybrain-mcp = "server:main"
+
+[tool.setuptools]
+py-modules = ["server"]

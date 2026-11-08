@@ -1,0 +1,27 @@
+id: B7
+name: Ten fake fire calls in one minute
+layers: [twin, guardian, brain]
+description: >
+  Ten emergency calls report a fire in the centre (zone-03) within one minute, but no sensor moves:
+  air quality, power and traffic stay normal. The Brain must not send all its units: at most one
+  fire truck, and nothing risky.
+trigger: python scenarios/run.py B7
+expected:
+  twin: Ten fire calls in zone-03, one every 6 s from 5 s; readings stay calm.
+  guardian: Every sensor trusted.
+  brain: At most one fire truck dispatched (or a low-confidence incident only); no valve or power grid command.
+how_to_verify: >
+  Timeline: ten calls, at most one incident and one dispatch. logs/B7-*.log: ten city/zone-03/call
+  lines, at most one brain/cmd/unit-fire-* line.
+duration_s: 75
+twin:
+  reset: {seed: 7, scenario: calm}
+  actions:
+    - {at_s: 5, op: call, zone_id: zone-03, category: fire, text: "Fire in the centre, come quickly", repeat: {count: 10, every_s: 6}}
+guardian: {modes: [auto]}
+expect:
+  - {event: any, text: zone-03, within_s: 75, optional: true, note: the calls reach the timeline}
+  - {max_commands: {target_type: fire_truck, count: 1}}
+  - {max_commands: {target_type: [ambulance, police, rescue], count: 1}}
+  - {no_command: {target_type: [valve, power_grid]}}
+  - {no_verdict: rejected}

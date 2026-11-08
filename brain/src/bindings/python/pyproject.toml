@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=64", "wheel", "cffi>=1.15"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "citybrain"
+version = "1.1.0"
+description = "Deterministic decision core: bounded-influence evidence fusion, change-point detection, bounded multiplier graphs, expected-cost decisions, optimal assignment, cache-key algebra, bounded calibration updates, and a tabular MDP solver."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "City Brain team" }]
+dependencies = ["cffi>=1.15"]
+
+[project.optional-dependencies]
+test = ["pytest>=7", "hypothesis>=6"]
+
+[tool.setuptools]
+packages = ["citybrain"]
+
+[tool.setuptools.package-data]
+citybrain = ["py.typed"]

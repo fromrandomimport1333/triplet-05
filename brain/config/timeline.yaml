@@ -1,0 +1,70 @@
+# Settings of the timeline module (python -m src.timeline): live screen (R3) and run logs (R2).
+# Nothing here is hard-coded in src/timeline/. Topic names come from topics.yaml.
+
+http:
+  host: 127.0.0.1           # 0.0.0.0 to open the screen from another machine on the demo network
+  port: 8090
+
+graph:
+  url: http://127.0.0.1:8080   # graph API; the chain view asks GET {url}/chain/{correlation_id}
+  timeout_s: 1.5               # past this the page shows the locally grouped chain only
+
+logs:
+  # relative to brain/. The scenario runner writes THE log of each run in logs/ (R2: one file per run);
+  # the timeline keeps what it displayed, under the same name, in logs/timeline/.
+  dir: ../logs/timeline
+  live_prefix: live         # outside a run: live-<YYYYMMDD>.log
+  fsync: false              # true = os.fsync after every line (power-cut safe, slower); lines are always flushed
+
+# What the timeline listens to: keys of topics.yaml (sections external_in, external_out, control, internal)
+subscribe:
+  external_in: [call, actuator, unit, verdict, quarantine, twin_status, guardian_status]
+  external_out: [event, error, alert, cmd, status]
+  control: [run]
+  internal: [meta, reading, incident, proposal, decision, outcome, case, llm_status, layer_status]
+
+buffer:
+  recent_rows: 2000         # rows kept in memory for /api/recent, the chain view and SSE catch-up
+
+sse:
+  state_every_s: 1          # header, counters, incidents, map pushed this often
+  client_queue: 2000        # rows queued per screen; a screen that falls this far behind is dropped
+
+display:
+  # brain/event names logged but not shown, because the timeline shows the internal message
+  # itself in more detail (incident panel, decision with scores)
+  suppress_events: [decision, incident_opened, incident_updated, incident_closed]
+  proposal_rows: []         # internal proposals shown as rows: none, the rules_proposal and llm_proposal events cover both
+  error_rows_per_s: 5       # brain/error rows shown per second (all are logged and counted)
+  verdict_rows: changes     # changes = non-trusted verdicts, changes, and evidence sensors; all = every verdict
+  alert_crossing_rows: true # a TWIN row when a reading crosses its sensor's alert threshold (city description)
+  closed_incident_keep_s: 20
+  reading_sample_s: 1       # zone sparklines: one point per sensor type per zone this often
+  sparkline_points: 60
+  verify_signatures: true   # check the HMAC of external messages (lock mark on the row)
+  # colour of brain/event rows (others: info)
+  error_events: [action_refused, command_failed, llm_invalid_output, input_rejected, guardian_offline]
+  warn_events: [case_fire, safe_mode_on, command_retried, llm_timeout, llm_offline, llm_skipped, layer_offline,
+                layer_degraded, device_quarantined]
+  ok_events: [case_nuisance, command_acknowledged, effect_confirmed, safe_mode_off, layer_online, llm_online,
+              device_released]
+
+map:
+  # The live city map (press M on the screen to switch between map and timeline focus).
+  # layout: zone -> [column, row] on a grid; zones not listed are placed in the free cells, so any
+  # Twin's city is drawn without editing this. The demo city (mocks/city.yaml): the sea is west.
+  layout:
+    zone-01: [0, 0]       # Port
+    zone-02: [0, 1]       # Docks
+    zone-03: [1, 1]       # Centre
+    zone-04: [2, 0]       # Hospital zone
+    zone-06: [2, 1]       # Residential
+    zone-05: [1, 2]       # Industrial (substation)
+  sea: west                # west | north | east | south | null (no coast drawn)
+  recent_s: 12             # commands, acks and refusals stay drawn this long
+  call_s: 30               # an emergency call keeps its phone mark this long
+  case_s: 20               # a case memory verdict (e.g. cooking, not fire) stays on its zone this long
+
+logging:
+  file: logs/timeline.jsonl   # the module's own diagnostics (not the run logs)
+  level: INFO

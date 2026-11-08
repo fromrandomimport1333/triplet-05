@@ -1,0 +1,177 @@
+{
+  "$defs": {
+    "IncidentEvidence": {
+      "additionalProperties": false,
+      "properties": {
+        "source_id": {
+          "title": "Source Id",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "reading",
+            "call"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Value"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unit"
+        },
+        "category": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Category"
+        },
+        "trust": {
+          "title": "Trust",
+          "type": "number"
+        }
+      },
+      "required": [
+        "source_id",
+        "kind",
+        "trust"
+      ],
+      "title": "IncidentEvidence",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "brain/internal/incident: opened / updated / closed (team plan 02, 4.4).",
+  "properties": {
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "timestamp": {
+      "title": "Timestamp",
+      "type": "string"
+    },
+    "correlation_id": {
+      "title": "Correlation Id",
+      "type": "string"
+    },
+    "incident_id": {
+      "title": "Incident Id",
+      "type": "string"
+    },
+    "type": {
+      "enum": [
+        "flood",
+        "fire",
+        "accident",
+        "traffic_jam",
+        "power_problem"
+      ],
+      "title": "Type",
+      "type": "string"
+    },
+    "zone_id": {
+      "title": "Zone Id",
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "opened",
+        "updated",
+        "closed"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "confidence": {
+      "title": "Confidence",
+      "type": "number"
+    },
+    "severity": {
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
+      "title": "Severity",
+      "type": "string"
+    },
+    "verified": {
+      "title": "Verified",
+      "type": "boolean"
+    },
+    "evidence": {
+      "items": {
+        "$ref": "#/$defs/IncidentEvidence"
+      },
+      "title": "Evidence",
+      "type": "array"
+    },
+    "reason": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Reason"
+    },
+    "case": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Case"
+    }
+  },
+  "required": [
+    "id",
+    "timestamp",
+    "correlation_id",
+    "incident_id",
+    "type",
+    "zone_id",
+    "status",
+    "confidence",
+    "severity",
+    "verified",
+    "evidence"
+  ],
+  "title": "Incident",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

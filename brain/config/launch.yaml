@@ -1,0 +1,23 @@
+# Modules started by `python run.py` (from brain/). Each runs as its own process, so one module
+# crashing never stops the others; the launcher restarts it (with back-off) and prefixes its output.
+
+broker_wait_s: 30          # wait this long for the broker before starting (0 = do not wait)
+restart:
+  max_per_minute: 5        # a module crashing more often than this is left stopped (and reported)
+  backoff_s: [1, 2, 5, 10]
+
+modules:                   # name: python module (python -m <module>)
+  input: src.input
+  detection: src.detection
+  memory: src.memory
+  graph: src.graph
+  llm: src.llm
+  scoring: src.scoring
+  output: src.output
+  timeline: src.timeline
+
+mocks:                     # started with --mocks (stand-ins for the other layers, R1)
+  twin: mocks.twin
+  guardian: mocks.guardian
+
+mock_llm: mocks.mock_llm   # replaces `llm` with --mock-llm (no GPU / no Ollama)

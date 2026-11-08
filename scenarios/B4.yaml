@@ -1,0 +1,29 @@
+id: B4
+name: Guardian offline during a flood
+layers: [twin, guardian, brain]
+description: >
+  Guardian goes offline at 3 s; a flood starts at the port at 10 s. Without trust verdicts the Brain
+  works in safe mode: the incident is detected but unverified, risky actions (valve) wait or are
+  refused, low-risk actions (traffic signal) still go out.
+trigger: python scenarios/run.py B4
+expected:
+  twin: Flood in zone-01 from 10 s (water-01 over 1.3 m, rising).
+  guardian: guardian/status offline at 3 s, then silent.
+  brain: Guardian marked offline, incident flood zone-01 with verified false, decision in safe mode, no valve command; a traffic signal command is allowed.
+how_to_verify: >
+  Timeline: guardian offline -> incident opened (unverified) -> decision (safe mode) -> valve refused
+  or not chosen -> signal command. logs/B4-*.log: layer_offline event, no brain/cmd/valve-* line.
+duration_s: 60
+twin:
+  reset: {seed: 7, scenario: flood, scenario_zone: zone-01, scenario_after_ticks: 10}
+guardian:
+  modes: [auto]
+  actions:
+    - {at_s: 3, mode: offline}
+expect:
+  - {event: layer_offline, text: guardian, within_s: 8}
+  - {layer: guardian, match: {status: offline}, within_s: 8}
+  - {incident: flood, match: {zone_id: zone-01, verified: false}, within_s: 30}
+  - {decision: {mode: safe}, within_s: 40}
+  - {no_command: {target_type: valve}}
+  - {command: {target_type: traffic_signal}, within_s: 45}

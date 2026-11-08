@@ -1,0 +1,2 @@
+# Docker overlay (BRAIN_CONFIG_OVERLAY=config/overlays/docker): merged on top of config/broker.yaml.
+host: broker            # the compose service name (also in the broker certificate)

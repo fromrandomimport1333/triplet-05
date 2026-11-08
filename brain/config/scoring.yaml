@@ -1,0 +1,104 @@
+# Scoring model and decision timing (team plan 04, sections 5 and 6). Read by src/scoring/.
+# Every number of the formulas is here; nothing is hard-coded in the code.
+#
+#   P      = confidence x severity_weight x zone_importance x (1 + waiting_s / waiting_scale_s)
+#   action = P x effectiveness - cost - risk x (1 - trust) x risk.weight  [- safe_mode.penalty x risk x P]
+#   score of a proposal = sum of its action scores that are > 0 (actions <= 0 are dropped)
+
+priority:
+  severity_weight: {low: 1, medium: 2, high: 3, critical: 4}
+  waiting_scale_s: 60            # waiting incidents gain priority: +100 % per minute
+  # zone importance from the city description (zone `type` and `exposure`); the largest match wins
+  zone_importance:
+    default: 1.0
+    by_type: {medical: 2.0, hospital: 2.0, school: 1.5}
+    by_exposure: {high: 1.5, critical: 2.0}
+
+# How well an action usually solves an incident type, 0..1.
+# incident type -> target type (actuator type or unit type) -> action. Missing = default.
+effectiveness:
+  default: 0.0
+  flood:
+    valve:          {open: 0.9}
+    traffic_signal: {priority: 0.3}
+    rescue:         {dispatch: 0.6}
+    ambulance:      {dispatch: 0.3}
+  fire:
+    fire_truck:     {dispatch: 0.9}
+    traffic_signal: {priority: 0.4}
+    ambulance:      {dispatch: 0.5}
+    power_grid:     {shed: 0.3}
+  accident:
+    ambulance:      {dispatch: 0.9}
+    police:         {dispatch: 0.5}
+    rescue:         {dispatch: 0.5}
+    traffic_signal: {priority: 0.4}
+  traffic_jam:
+    traffic_signal: {priority: 0.7}
+    police:         {dispatch: 0.4}
+  power_problem:
+    power_grid:     {shed: 0.8}
+    traffic_signal: {priority: 0.2}
+
+# Cost of one action, normalised 0..1 (clipped):
+#   distance_weight x min(hops, max_hops) / max_hops + unit_weight (unit) or actuator_weight (actuator)
+# hops = zone hops (BFS on the `adjacent` lists of meta) from the unit position, or from the
+# nearest zone the actuator controls, to the incident zone. Unreachable = max_hops.
+cost:
+  max_hops: 4
+  distance_weight: 0.3
+  unit_weight: 0.2               # a unit used is not available for another incident
+  actuator_weight: 0.05
+
+# Risk of an action, 0..1: what goes wrong if the evidence is false.
+# target kind (actuator type, or `unit` for every unit) -> action. Missing = default.
+risk:
+  default: 0.3
+  by_target:
+    valve:          {open: 0.6, close: 0.3}
+    power_grid:     {shed: 0.7, normal: 0.2}
+    traffic_signal: {priority: 0.1, normal: 0.05}
+    unit:           {dispatch: 0.4, recall: 0.2}
+  weight: 1.0                    # risk_penalty = weight x risk x (1 - trust)
+  levels: {medium: 0.3, high: 0.6}   # Decision.risk: label of the largest risk (>= value)
+
+# Trust of the evidence. Per evidence item: Guardian's latest trust_score for that sensor
+# (brain/internal/trust), else its verdict value, else the trust given by detection.
+trust:
+  verdict_values: {trusted: 1.0, suspicious: 0.5, rejected: 0.0}
+  combine: mean                  # mean | min | max over the evidence items
+
+# Safe mode: Guardian offline, or incident not verified. Risky actions get a large penalty,
+# so low-risk ones win, unless enough different sensor types agree.
+safe_mode:
+  guardian_states: [offline]     # brain/internal/layer-status/guardian values that mean safe mode
+  unverified_incident: true      # incident `verified: false` also means safe mode
+  risky_from: 0.3                # an action with risk >= this is risky
+  penalty: 2.5                   # subtracted x risk x P: a risky action needs effectiveness > 2.5 x risk
+  agree_sensor_types: 2          # different sensor types that lift the penalty
+  agree_min_trust: 0.5           # an evidence reading counts only from this trust up
+
+# Units (team plan 04, 6.3)
+units:
+  # A unit held by another incident is taken only if this incident's P >= ratio x the holder's P.
+  # The Twin refuses a dispatch of a busy unit, so taking it means a `recall` now; the incident
+  # is decided again with a dispatch when the unit is free.
+  preempt_ratio: 1.5
+
+decide:
+  budget_s: null                 # wait for the LLM proposal; null = config/llm.yaml budget.answer_s
+  immediate_severities: [critical]   # decide on rules at once, switch if a better LLM proposal comes
+  llm_give_up_events: [llm_timeout, llm_invalid_output, llm_skipped]
+  redecide_on: {severity_increase: true, new_evidence_type: true}
+  min_score: 0.0                 # best score <= this: no decision (decision_skipped)
+  switch_margin: 0.0             # an LLM proposal must beat the current decision by more than this
+  max_redecisions: 5             # per incident, after failed / refused actions (coalesced per tick) or freed units
+  reservation_ttl_s: 30         # a dispatched unit never reported out (no ack, Twin reset) is released after this
+  explanation_max_chars: 300
+  early_llm_keep_s: 10           # an LLM proposal that arrives before its incident is kept this long
+
+tick_s: 0.5                      # how often deadlines are checked
+
+logging:
+  file: logs/scoring.jsonl
+  level: INFO

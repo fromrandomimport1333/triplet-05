@@ -1,0 +1,47 @@
+# Every topic name used by the Brain. Names may change after alignment with the
+# Guardian team (e.g. twin/events/#): edit here, never in code.
+#
+# External patterns use {placeholders}; each becomes a "+" wildcard when
+# subscribing, and its value is compared with the body (topic/body mismatch = E_FORMAT).
+
+external_in:
+  meta:        {pattern: "twin/meta",                                 source: twin,     qos: 1}
+  reading:     {pattern: "city/{zone_id}/sensor/{type}/{sensor_id}",  source: twin,     qos: 0}
+  call:        {pattern: "city/{zone_id}/call",                       source: twin,     qos: 1}
+  actuator:    {pattern: "twin/actuator/{actuator_id}",               source: twin,     qos: 1}
+  unit:        {pattern: "twin/unit/{unit_id}",                       source: twin,     qos: 1}
+  verdict:     {pattern: "guardian/verdict/{sensor_id}",              source: guardian, qos: 1}
+  quarantine:  {pattern: "guardian/quarantine/{device_id}",           source: guardian, qos: 1}
+  twin_status:     {pattern: "twin/status",                           source: twin,     qos: 1}
+  guardian_status: {pattern: "guardian/status",                       source: guardian, qos: 1}
+
+external_out:
+  status: {topic: brain/status, qos: 1, retain: true}    # Last Will offline (BR-4)
+  error:  {topic: brain/error,  qos: 0, retain: false}   # rejected messages (BR-5)
+  event:  {topic: brain/event,  qos: 0, retain: false}   # timeline (BR-3)
+  cmd:    {topic: "brain/cmd/{target_id}", qos: 1, retain: false}   # commands to actuators / units (BR-1)
+  alert:  {topic: brain/alert,  qos: 1, retain: false}   # e.g. actuator not responding (team plan 05 §3)
+
+# Test-run control, published by the scenario runner (scenarios/run): the timeline starts a new
+# log file per run (R2). Not read by the decision modules.
+control:
+  run:    {topic: brain/control/run, qos: 1, retain: true}
+  # Mock LLM only: {"mode": "scripted" | "slow" | "offline" | "invalid"} (mocks/mock_llm/control.py)
+  llm:    {topic: brain/control/llm, qos: 1, retain: false}
+
+internal:
+  # Published by the input module (formats: team-docs overview, section 3)
+  meta:         {topic: brain/internal/meta,                         qos: 1, retain: true}
+  reading:      {topic: brain/internal/reading,                      qos: 0, retain: false}
+  call:         {topic: brain/internal/call,                         qos: 1, retain: false}
+  trust:        {topic: "brain/internal/trust/{sensor_id}",          qos: 1, retain: true}
+  quarantine:   {topic: "brain/internal/quarantine/{device_id}",     qos: 1, retain: true}
+  ack:          {topic: brain/internal/ack,                          qos: 1, retain: false}
+  layer_status: {topic: "brain/internal/layer-status/{layer}",       qos: 1, retain: true}
+  # Published by the other modules
+  incident:     {topic: brain/internal/incident,                     qos: 1, retain: false}
+  proposal:     {topic: brain/internal/proposal,                     qos: 1, retain: false}
+  llm_status:   {topic: brain/internal/llm-status,                   qos: 1, retain: true}   # Last Will offline
+  decision:     {topic: brain/internal/decision,                     qos: 1, retain: false}
+  outcome:      {topic: brain/internal/outcome,                      qos: 1, retain: false}
+  case:         {topic: brain/internal/case,                         qos: 1, retain: false}   # case memory verdict per zone

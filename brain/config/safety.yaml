@@ -1,0 +1,41 @@
+# Safety rules of the output module (team plan 05, section 4). Applied to every action of a
+# decision, in the order S1..S6; the first rule that fails refuses the action (never silently:
+# brain/internal/outcome `refused` + brain/event `action_refused`). No score can override them.
+
+rules:                      # turn a rule off only for a test; the jury expects all six
+  S1_quarantine: true       # target quarantined by Guardian
+  S2_rejected_evidence: true  # every piece of evidence of the incident was rejected (trust 0)
+  S3_two_sources: true      # risky action needs >= s3_min_sources different sources agreeing
+  S4_cooldown: true         # same action on the same device again within s4_cooldown_s
+  S5_allowed_action: true   # action not allowed for the device (city description); unknown target
+  S6_guardian_offline: true # risky action while Guardian is offline needs 2 different sensor TYPES
+  S7_twin_offline: true     # no command while the Twin is offline: nobody would execute it
+
+# Risky actions (S3, S6). kind: actuator | unit; type: actuator or unit type from the city
+# description (omit = any type); action: the action name.
+risky_actions:
+  - {kind: actuator, type: valve, action: open}
+  - {kind: actuator, type: power_grid, action: shed}
+  - {kind: unit, action: dispatch}
+
+# Units have no `actions` in the city description: these are the allowed ones (S5).
+unit_actions: [dispatch, recall]
+
+evidence:
+  # A source counts (S3, S6) when its trust is above this. Rejected readings have trust 0.
+  min_trust: 0.0
+  # Trust of a sensor named in the decision's evidence_sensors when Guardian gave no verdict yet.
+  unverified_trust: 1.0
+  # Emergency calls: all the calls of an incident (one zone) count together as ONE source, so
+  # ten calls from the same zone never replace a sensor (scenario B7). false = calls never count.
+  calls_count_as_one_source: true
+
+s3_min_sources: 2
+s4_cooldown_s: 60
+s4_scope: same_action        # same_action | any_action (any action on the same device)
+s6_min_sensor_types: 2
+# Guardian layer status values that mean "offline" for S6 and safe mode
+guardian_offline_states: [offline]
+# Twin layer status values that mean "offline" for S7. When the Twin comes back online after being
+# offline (a restart, a scenario reset), its actuators are back to their defaults: cooldowns (S4) end.
+twin_offline_states: [offline]

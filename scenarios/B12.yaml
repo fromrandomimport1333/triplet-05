@@ -1,0 +1,25 @@
+id: B12
+name: LLM offline during a flood
+layers: [twin, guardian, brain]
+description: >
+  The (mock) LLM is offline for the whole run when a flood starts at the port. The rule fallback
+  must still give a proposal: the decision comes from the rules and the valve is opened.
+trigger: python scenarios/run.py B12
+expected:
+  twin: Flood in zone-01 from 5 s; valve-01 acknowledges and lowers the level.
+  guardian: water-01 trusted.
+  brain: LLM status offline; decision with origin rules; command valve-01 open; no LLM proposal.
+how_to_verify: >
+  Timeline: LLM offline -> incident opened -> rules proposal -> decision (rules) -> valve-01 opened.
+  logs/B12-*.log: decision line with origin rules, brain/cmd/valve-01 open.
+duration_s: 50
+twin:
+  reset: {seed: 7, scenario: flood, scenario_zone: zone-01, scenario_after_ticks: 5}
+guardian: {modes: [auto]}
+llm: {mode: offline}
+expect:
+  - {event: incident_opened, match: {zone_id: zone-01, type: flood}, within_s: 20}
+  - {decision: rules, within_s: 35}
+  - {no_decision: llm}
+  - {no_proposal: llm}
+  - {command: {target_type: valve, action: open}, within_s: 40}

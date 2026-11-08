@@ -1,0 +1,54 @@
+{
+  "additionalProperties": false,
+  "description": "brain/internal/llm-status (retained, Last Will offline).",
+  "properties": {
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "timestamp": {
+      "title": "Timestamp",
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "online",
+        "offline"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "model": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Model"
+    },
+    "reason": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Reason"
+    }
+  },
+  "required": [
+    "id",
+    "timestamp",
+    "status"
+  ],
+  "title": "LlmStatus",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

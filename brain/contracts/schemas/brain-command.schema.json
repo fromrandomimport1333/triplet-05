@@ -1,0 +1,63 @@
+{
+  "additionalProperties": false,
+  "description": "brain/cmd/{target_id} (BR-1), sealed for the Twin. Format accepted by the mock Twin.",
+  "properties": {
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "timestamp": {
+      "title": "Timestamp",
+      "type": "string"
+    },
+    "source": {
+      "const": "brain",
+      "default": "brain",
+      "title": "Source",
+      "type": "string"
+    },
+    "correlation_id": {
+      "title": "Correlation Id",
+      "type": "string"
+    },
+    "target_id": {
+      "title": "Target Id",
+      "type": "string"
+    },
+    "action": {
+      "title": "Action",
+      "type": "string"
+    },
+    "parameters": {
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "integer"
+          },
+          {
+            "type": "number"
+          },
+          {
+            "type": "boolean"
+          }
+        ]
+      },
+      "default": {},
+      "title": "Parameters",
+      "type": "object"
+    }
+  },
+  "required": [
+    "id",
+    "timestamp",
+    "correlation_id",
+    "target_id",
+    "action"
+  ],
+  "title": "BrainCommand",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

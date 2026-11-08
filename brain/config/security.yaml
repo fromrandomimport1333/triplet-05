@@ -1,0 +1,35 @@
+# Paths to keys and certificates. The files live in brain/secrets/ (git-ignored, SEC-5).
+# Paths are relative to the brain/ folder.
+tls:
+  enabled: true
+  ca_cert: secrets/ca.crt
+  # mTLS (SEC-6 / Guardian alignment): leave empty to use username + password only
+  client_cert: ""
+  client_key: ""
+  insecure_skip_hostname_check: false
+
+auth:
+  username: brain
+  password_file: secrets/broker-password.txt   # empty or missing file = no password
+
+# One HMAC key per pair of layers (SEC-9). File content = the key as UTF-8 text,
+# surrounding whitespace removed. At least 32 random bytes in the real system.
+hmac_keys:
+  twin: secrets/keys/twin-brain.key
+  guardian: secrets/keys/guardian-brain.key
+
+# Name of this layer in the `hmacs` field of multi-receiver messages (SEC-10)
+hmacs_self: brain
+
+guardian_signature:
+  # hmac now; switch to ed25519 once agreed with the Guardian team
+  mode: hmac                     # hmac | ed25519
+  ed25519_public_key: secrets/keys/guardian-ed25519.pub   # PEM, or 64 hex chars
+  sig_field: sig                 # envelope field holding the signature
+  sig_encoding: base64           # base64 | hex
+
+# Messages the Brain itself publishes outside brain/internal/ (brain/status,
+# brain/error, brain/event) are sealed with these keys (SEC-7, SEC-10).
+outgoing:
+  seal: true
+  hmacs_for: [twin, guardian]

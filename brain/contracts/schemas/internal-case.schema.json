@@ -1,0 +1,112 @@
+{
+  "additionalProperties": false,
+  "description": "brain/internal/case: the case memory's verdict for one zone (src/memory).\n\nThe zone's live readings over the last window, encoded like the library's cases, and the\nvote of the k most similar cases. Detection uses it as a support signal (fire) or to hold\ndown smoke readings (nuisance, e.g. cooking).",
+  "properties": {
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "timestamp": {
+      "title": "Timestamp",
+      "type": "string"
+    },
+    "correlation_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Correlation Id"
+    },
+    "zone_id": {
+      "title": "Zone Id",
+      "type": "string"
+    },
+    "incident_type": {
+      "enum": [
+        "flood",
+        "fire",
+        "accident",
+        "traffic_jam",
+        "power_problem"
+      ],
+      "title": "Incident Type",
+      "type": "string"
+    },
+    "verdict": {
+      "enum": [
+        "quiet",
+        "nuisance",
+        "fire"
+      ],
+      "title": "Verdict",
+      "type": "string"
+    },
+    "share": {
+      "title": "Share",
+      "type": "number"
+    },
+    "k": {
+      "title": "K",
+      "type": "integer"
+    },
+    "votes": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Votes",
+      "type": "object"
+    },
+    "sources": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Sources",
+      "type": "object"
+    },
+    "features": {
+      "additionalProperties": {
+        "type": "number"
+      },
+      "title": "Features",
+      "type": "object"
+    },
+    "sensors": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Sensors",
+      "type": "array"
+    },
+    "library": {
+      "title": "Library",
+      "type": "string"
+    },
+    "summary": {
+      "title": "Summary",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "timestamp",
+    "zone_id",
+    "incident_type",
+    "verdict",
+    "share",
+    "k",
+    "votes",
+    "sources",
+    "features",
+    "sensors",
+    "library",
+    "summary"
+  ],
+  "title": "CaseMatch",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}
