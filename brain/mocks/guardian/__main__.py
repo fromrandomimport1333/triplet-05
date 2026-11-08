@@ -28,7 +28,9 @@ def main() -> None:
     text = config.read_secret(keys["guardian"])
     if not text:
         sys.exit("missing HMAC key guardian-brain (see brain/README.md)")
-    twin_text = config.read_secret(keys["twin"])   # optional: check the readings' HMAC
+    # optional: check the readings' HMAC. The Twin's pair key for the Guardian (twin-guardian) when it
+    # exists, else the twin-brain key (a Twin that seals with a single `hmac` for the Brain only)
+    twin_text = config.read_secret(cfg.get("twin_key_file")) or config.read_secret(keys["twin"])
 
     client: GuardianMqtt | None = None
 

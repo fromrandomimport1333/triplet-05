@@ -17,6 +17,9 @@ topic read brain/cmd/#
 topic read brain/status
 topic read brain/error
 topic read twin/control
+# Guardian quarantines (a quarantined actuator refuses commands) and its control topic
+topic read guardian/quarantine/#
+topic read guardian/control/#
 
 # --- Guardian: verdicts, quarantines, status; reads the same data as the Brain
 user guardian

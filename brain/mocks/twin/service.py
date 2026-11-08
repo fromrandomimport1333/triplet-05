@@ -19,7 +19,7 @@ from datetime import datetime, timezone
 from typing import Any, Callable
 
 from src.common import config
-from src.common.envelope import EnvelopeError, parse_envelope, seal, verify_hmac
+from src.common.envelope import EnvelopeError, parse_envelope, seal, seal_multi, verify_hmac
 from src.common.log import EventLogger
 
 from .city import load_city
@@ -59,6 +59,7 @@ class TwinService:
         publish: Publisher,
         *,
         key: bytes,
+        guardian_key: bytes | None = None,
         clock: Callable[[], float] = time.time,
         logger: EventLogger | None = None,
         twin_cfg: dict[str, Any] | None = None,
@@ -68,6 +69,7 @@ class TwinService:
         self.topics_cfg = topics_cfg or config.load("topics")
         self._publish = publish
         self._key = key
+        self._guardian_key = guardian_key   # set: every message is sealed for the Brain and the Guardian
         self.clock = clock
         self.log = logger or EventLogger("twin-mock")
         self._lock = threading.RLock()
@@ -98,9 +100,15 @@ class TwinService:
     def _now_iso(self) -> str:
         return datetime.fromtimestamp(self.clock(), timezone.utc).isoformat(timespec="milliseconds").replace("+00:00", "Z")
 
+    def _seal(self, body: dict[str, Any], tamper: bool = False) -> str:
+        """Single `hmac` (twin-brain key), or `hmacs` {brain, guardian} when the twin-guardian key is set."""
+        wrong = (lambda k: b"wrong-key-" + k) if tamper else (lambda k: k)
+        if self._guardian_key is None:
+            return seal(body, wrong(self._key))
+        return seal_multi(body, {"brain": wrong(self._key), "guardian": wrong(self._guardian_key)})
+
     def _send(self, topic: str, body: dict[str, Any], qos: int, retain: bool, tamper: list[str] | None = None) -> None:
-        key = b"wrong-key-" + self._key if tamper and "bad_hmac" in tamper else self._key
-        self._publish(topic, seal(body, key), qos, retain)
+        self._publish(topic, self._seal(body, bool(tamper and "bad_hmac" in tamper)), qos, retain)
 
     def _send_outputs(self, outputs: list[dict[str, Any]]) -> None:
         for out in outputs:
@@ -109,7 +117,7 @@ class TwinService:
 
     def status_payload(self, status: str) -> str:
         """twin/status body, sealed (used for the Last Will and on every connect)."""
-        return seal(self.mapper.status(status)[1], self._key)
+        return self._seal(self.mapper.status(status)[1])
 
     def subscriptions(self) -> list[tuple[str, int]]:
         return [(self.cfg["topics"]["cmd"], 1), (self.cfg["topics"]["control"], 1)]

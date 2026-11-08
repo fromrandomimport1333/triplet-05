@@ -27,6 +27,7 @@ secrets/broker/                    # broker certificate, key and password file (
 secrets/broker-password.txt        # password of the `brain` account (twin-, guardian-, tester-password.txt: the others)
 secrets/keys/twin-brain.key        # HMAC key Twin-Brain (32 random bytes, hex)
 secrets/keys/guardian-brain.key    # HMAC key Guardian-Brain
+secrets/keys/twin-guardian.key     # HMAC key Twin-Guardian (give it to both teams; the mock Twin signs readings for both)
 secrets/keys/guardian-ed25519.pub  # only if guardian_signature.mode = ed25519
 ```
 

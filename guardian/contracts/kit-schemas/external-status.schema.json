@@ -1,0 +1,68 @@
+{
+  "description": "{layer}/status (TR-6).",
+  "properties": {
+    "id": {
+      "maxLength": 128,
+      "minLength": 1,
+      "title": "Id",
+      "type": "string"
+    },
+    "timestamp": {
+      "title": "Timestamp",
+      "type": "string"
+    },
+    "source": {
+      "enum": [
+        "twin",
+        "guardian",
+        "brain"
+      ],
+      "title": "Source",
+      "type": "string"
+    },
+    "correlation_id": {
+      "anyOf": [
+        {
+          "maxLength": 128,
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Correlation Id"
+    },
+    "seq": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Seq"
+    },
+    "status": {
+      "enum": [
+        "online",
+        "offline",
+        "degraded"
+      ],
+      "title": "Status",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "timestamp",
+    "source",
+    "status"
+  ],
+  "title": "StatusBody",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

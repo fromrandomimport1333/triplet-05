@@ -1,0 +1,9 @@
+{
+  "_comment": "Brain-profile thresholds per sensor type (SENSOR_LIMITS_FILE). Values are in the 'unit' given here and are converted to each sensor's own twin/meta unit; min/max always come from twin/meta (the min/max below are used only for a sensor missing from twin/meta). null = rule off. See guardian/INTERFACE.md section 8 'Calibration'.",
+  "water_level":     {"unit": "m",            "max_rate_per_s": 0.8,  "max_step": 1.0,  "noise_floor": 0.1,  "min": 0, "max": 10},
+  "traffic_speed":   {"unit": "km/h",         "max_rate_per_s": null, "max_step": null, "noise_floor": 5.0,  "min": 0, "max": 200},
+  "traffic_density": {"unit": "vehicles/km",  "max_rate_per_s": null, "max_step": null, "noise_floor": 5.0,  "min": 0, "max": 500},
+  "traffic_flow":    {"unit": "vehicles/min", "max_rate_per_s": null, "max_step": null, "noise_floor": 3.0,  "min": 0, "max": 500},
+  "power_load":      {"unit": "kW",           "max_rate_per_s": null, "max_step": null, "noise_floor": 50.0, "min": 0, "max": 10000},
+  "air_quality":     {"unit": "ug/m3",        "max_rate_per_s": null, "max_step": null, "noise_floor": 10.0, "min": 0, "max": 1000}
+}

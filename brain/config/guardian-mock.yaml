@@ -11,8 +11,9 @@ topics:
   control: guardian/control             # test control, sealed with the guardian-brain key
 
 city: mocks/city.yaml        # sensors known before twin/meta arrives (relative to brain/)
-verify_twin_hmac: true       # check readings with the twin-brain key when present (mock shortcut: the
-                             # real Guardian reads the Twin with its own key)
+verify_twin_hmac: true       # check the readings' HMAC (tag `guardian`, or the single `hmac`)
+twin_key_file: secrets/keys/twin-guardian.key   # pair key Twin-Guardian; missing file = the twin-brain key
+                             # (must match guardian_key_file of twin-mock.yaml)
 envelope: hmac               # hmac: {"hmac": ...} | hmacs: {"hmacs": {"brain": ...}}
 
 # Modes applied at start, in order (team plan 06, section 5). A `mode` control message changes them:

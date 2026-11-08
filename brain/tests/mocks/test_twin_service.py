@@ -434,3 +434,50 @@ def test_offline_and_online_control(make_rig):
     rig.tick(1)
     assert rig.internal("brain/internal/layer-status/twin")[-1]["status"] == "online"
     assert rig.errors() == []
+
+
+# --- sealing for the Guardian too (pair key twin-guardian) --------------------------------------------------
+
+def test_with_a_guardian_key_every_message_is_sealed_for_brain_and_guardian():
+    from copy import deepcopy
+    from src.common import config
+    from src.common.envelope import parse_envelope, verify_hmac
+    from src.common.log import EventLogger
+    from mocks.twin.service import TwinService
+    from tests.mocks.conftest import Bus, Clock
+
+    guardian_key = b"twin-guardian-test-key"
+    cfg = deepcopy(config.load("twin-mock"))
+    clock, bus = Clock(), Bus()
+    twin = TwinService(bus, key=TWIN_KEY, guardian_key=guardian_key, clock=clock, twin_cfg=cfg,
+                       logger=EventLogger("twin-guardian-seal-test"))
+    twin.on_connect()
+    twin.tick()
+    assert bus.sent
+    for topic, payload, *_ in bus.sent:
+        env = parse_envelope(payload)
+        assert env.hmac is None and set(env.hmacs) == {"brain", "guardian"}, topic
+        verify_hmac(env, TWIN_KEY, "brain")
+        verify_hmac(env, guardian_key, "guardian")
+    status = parse_envelope(twin.status_payload("offline"))
+    verify_hmac(status, guardian_key, "guardian")
+
+
+def test_bad_hmac_fault_breaks_both_tags():
+    from mocks.twin.service import TwinService
+    from src.common.envelope import EnvelopeError, parse_envelope, verify_hmac
+    from tests.mocks.conftest import Bus, Clock
+
+    guardian_key = b"twin-guardian-test-key"
+    twin = TwinService(Bus(), key=TWIN_KEY, guardian_key=guardian_key, clock=Clock())
+    env = parse_envelope(twin._seal({"id": "x", "timestamp": "t", "source": "twin"}, tamper=True))
+    for key, name in ((TWIN_KEY, "brain"), (guardian_key, "guardian")):
+        with pytest.raises(EnvelopeError):
+            verify_hmac(env, key, name)
+
+
+def test_without_a_guardian_key_the_envelope_keeps_a_single_hmac(make_rig):
+    from src.common.envelope import parse_envelope
+    rig = make_rig()
+    rig.twin.on_connect()
+    assert all(parse_envelope(p).hmac and parse_envelope(p).hmacs is None for _, p, *_ in rig.twin_bus.sent)
