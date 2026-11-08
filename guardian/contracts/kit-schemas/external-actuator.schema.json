@@ -1,0 +1,106 @@
+{
+  "description": "twin/actuator/{id}: acknowledgement of a command, or a state change (TW-13, TW-14).",
+  "properties": {
+    "id": {
+      "maxLength": 128,
+      "minLength": 1,
+      "title": "Id",
+      "type": "string"
+    },
+    "timestamp": {
+      "title": "Timestamp",
+      "type": "string"
+    },
+    "source": {
+      "enum": [
+        "twin",
+        "guardian",
+        "brain"
+      ],
+      "title": "Source",
+      "type": "string"
+    },
+    "correlation_id": {
+      "anyOf": [
+        {
+          "maxLength": 128,
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Correlation Id"
+    },
+    "seq": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Seq"
+    },
+    "actuator_id": {
+      "maxLength": 64,
+      "pattern": "^[a-z0-9][a-z0-9-]*$",
+      "title": "Actuator Id",
+      "type": "string"
+    },
+    "result": {
+      "anyOf": [
+        {
+          "enum": [
+            "done",
+            "rejected",
+            "failed"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Result"
+    },
+    "state": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "State"
+    },
+    "reason": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Reason"
+    }
+  },
+  "required": [
+    "id",
+    "timestamp",
+    "source",
+    "actuator_id"
+  ],
+  "title": "ActuatorStateBody",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

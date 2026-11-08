@@ -1,0 +1,110 @@
+{
+  "description": "city/{zone}/sensor/{type}/{sensor_id} (TW-4, TW-5).",
+  "properties": {
+    "id": {
+      "maxLength": 128,
+      "minLength": 1,
+      "title": "Id",
+      "type": "string"
+    },
+    "timestamp": {
+      "title": "Timestamp",
+      "type": "string"
+    },
+    "source": {
+      "enum": [
+        "twin",
+        "guardian",
+        "brain"
+      ],
+      "title": "Source",
+      "type": "string"
+    },
+    "correlation_id": {
+      "anyOf": [
+        {
+          "maxLength": 128,
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Correlation Id"
+    },
+    "seq": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Seq"
+    },
+    "sensor_id": {
+      "maxLength": 64,
+      "pattern": "^[a-z0-9][a-z0-9-]*$",
+      "title": "Sensor Id",
+      "type": "string"
+    },
+    "zone_id": {
+      "maxLength": 64,
+      "pattern": "^[a-z0-9][a-z0-9-]*$",
+      "title": "Zone Id",
+      "type": "string"
+    },
+    "type": {
+      "title": "Type",
+      "type": "string"
+    },
+    "value": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "integer"
+        }
+      ],
+      "title": "Value"
+    },
+    "unit": {
+      "title": "Unit",
+      "type": "string"
+    },
+    "origin": {
+      "anyOf": [
+        {
+          "enum": [
+            "real",
+            "simulated"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Origin"
+    }
+  },
+  "required": [
+    "id",
+    "timestamp",
+    "source",
+    "sensor_id",
+    "zone_id",
+    "type",
+    "value",
+    "unit"
+  ],
+  "title": "ReadingBody",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

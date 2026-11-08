@@ -1,0 +1,8 @@
+# never commit secrets (kit handover section 2)
+.env
+secrets/
+certs/
+*.key
+ca.crt
+*-password.txt
+*.pem

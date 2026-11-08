@@ -1,0 +1,59 @@
+{
+  "additionalProperties": false,
+  "description": "brain/alert: a problem the Brain wants Guardian and the operators to know about.",
+  "properties": {
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "timestamp": {
+      "title": "Timestamp",
+      "type": "string"
+    },
+    "source": {
+      "const": "brain",
+      "default": "brain",
+      "title": "Source",
+      "type": "string"
+    },
+    "correlation_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Correlation Id"
+    },
+    "alert": {
+      "enum": [
+        "actuator_not_responding",
+        "actuator_no_effect",
+        "command_rejected"
+      ],
+      "title": "Alert",
+      "type": "string"
+    },
+    "target_id": {
+      "title": "Target Id",
+      "type": "string"
+    },
+    "detail": {
+      "title": "Detail",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "timestamp",
+    "alert",
+    "target_id",
+    "detail"
+  ],
+  "title": "BrainAlert",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}
