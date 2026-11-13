@@ -1,0 +1,13 @@
+id: R14
+testbook: Twin T9
+name: Drifting air sensor
+description: >
+  air-03 drifts upwards by 4 ug/m3 per second while its zone peer air-04 stays normal. Guardian must stop trusting
+  it (suspicious or rejected); the Brain must not send a fire truck on one drifting sensor.
+duration_s: 60
+steps:
+  - {at_s: 3, twin: POST /faults, body: {sensor_id: AIR_03, kind: drift, value: 4, duration_s: 55}}
+expect:
+  - {verdict: [suspicious, rejected], match: {sensor_id: air-03}, within_s: 50}
+  - {no_command: {target_type: fire_truck, action: dispatch}}
+  - {no_command: {target_type: [valve, power_grid]}}

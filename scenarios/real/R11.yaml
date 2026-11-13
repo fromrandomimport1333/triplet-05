@@ -1,0 +1,19 @@
+id: R11
+testbook: Twin T5
+name: Replayed readings rejected
+description: >
+  From 20 s the Twin replays old, correctly signed air-04 messages unchanged (old id, old timestamp) instead of
+  fresh ones. The Brain's input checks must refuse them (E_REPLAY: id already seen, or E_STALE: timestamp more
+  than 10 s old) and act on none of them.
+duration_s: 50
+steps:
+  - {at_s: 20, twin: POST /faults, body: {sensor_id: AIR_04, kind: replay, duration_s: 25}}
+expect:
+  - any_of:
+      - {error_code: E_REPLAY}
+      - {error_code: E_STALE}
+    after_s: 20
+    within_s: 50
+  - {no_error_code: any, within_s: 19, note: nothing refused before the attack}
+  - {no_event: incident_opened, match: {zone_id: zone-a, type: fire}}
+  - {verdict: [suspicious, rejected], match: {sensor_id: air-04}, after_s: 20, optional: true, note: "the Guardian may only audit refused duplicates (its VALIDATION.md, question 5)"}

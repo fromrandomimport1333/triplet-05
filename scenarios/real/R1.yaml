@@ -1,0 +1,14 @@
+id: R1
+testbook: B1
+name: Calm city (no false alarm)
+description: >
+  Nothing happens. The real Twin publishes its normal readings; Guardian trusts them and the Brain opens no
+  incident and sends no command. Catches false positives in the real data (noise, sensor drift, idle calls).
+duration_s: 45
+expect:
+  - {verdict: trusted, match: {sensor_id: water-07}, within_s: 45}
+  - {no_verdict: rejected}
+  - {no_verdict: suspicious, optional: true, note: a frozen camera in --fake mode is reported but does not fail the run}
+  - {no_event: incident_opened}
+  - {no_command: any}
+  - {no_error_code: any}

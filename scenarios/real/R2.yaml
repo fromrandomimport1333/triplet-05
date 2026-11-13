@@ -1,0 +1,24 @@
+id: R2
+testbook: B2
+name: Real flood on the zone A canal
+description: >
+  100 mm/h of rain on zone A: water-07 and water-08 rise 0.04 m/s. The Brain opens the flood incident on the
+  RISE of both canal sensors (detection.yaml: water_level require_rising), well before the 1.3 m alert, and
+  opens valve-03 within seconds; the valve drains faster than the rain fills, so the water never reaches the
+  alert and the incident closes once the rise stops. A resident still calls at 20 s; the rain stops at 45 s.
+duration_s: 80
+observe: {readings: [water-07]}
+steps:
+  - {at_s: 0, twin: POST /scenario/conditions, body: {zone_id: zone_a, rain_mm_h: 100}}
+  - {at_s: 20, twin: POST /emergency_calls, body: {call_type: flood, lonlat: [10.1930, 36.8037], severity: high, description: "Water is coming over the canal, the street is flooded"}}
+  - {at_s: 45, twin: POST /scenario/conditions, body: {zone_id: zone_a, rain_mm_h: 0}}
+expect:
+  - {verdict: trusted, match: {sensor_id: water-07}, after_s: 15}
+  - {no_verdict: rejected, match: {sensor_id: water-07}}
+  - {event: incident_opened, match: {zone_id: zone-a, type: flood}, within_s: 40}
+  - {command: {target_id: valve-03, action: open}, within_s: 50}
+  - {ack: done, match: {actuator_id: valve-03}, within_s: 55}
+  - {outcome: acknowledged, match: {target_id: valve-03}, within_s: 60}
+  - {reading: water-07, match: {value: {lt: 1.0}}, after_s: 55, within_s: 80}
+  - {event: incident_closed, match: {zone_id: zone-a, type: flood}, within_s: 80, optional: true}
+  - {no_error_code: any}

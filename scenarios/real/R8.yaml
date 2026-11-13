@@ -1,0 +1,24 @@
+id: R8
+testbook: B7
+name: Ten fake fire calls in one minute
+description: >
+  Ten fire calls from the same spot in zone B, every 5 s, with no smoke on any sensor. All the calls of one zone
+  count as ONE source, so they never replace a sensor: at most one fire truck SENT (a recall that frees a truck
+  still assigned to an earlier incident is not a second truck), and no valve or grid command.
+duration_s: 60
+steps:
+  - {at_s: 3, twin: POST /emergency_calls, body: {call_type: fire, lonlat: [10.1722, 36.8028], severity: high, genuine: false, description: "Fire! Fire in the building, come now (1)"}}
+  - {at_s: 8, twin: POST /emergency_calls, body: {call_type: fire, lonlat: [10.1722, 36.8028], severity: high, genuine: false, description: "Fire! Fire in the building, come now (2)"}}
+  - {at_s: 13, twin: POST /emergency_calls, body: {call_type: fire, lonlat: [10.1722, 36.8028], severity: high, genuine: false, description: "Fire! Fire in the building, come now (3)"}}
+  - {at_s: 18, twin: POST /emergency_calls, body: {call_type: fire, lonlat: [10.1722, 36.8028], severity: high, genuine: false, description: "Fire! Fire in the building, come now (4)"}}
+  - {at_s: 23, twin: POST /emergency_calls, body: {call_type: fire, lonlat: [10.1722, 36.8028], severity: high, genuine: false, description: "Fire! Fire in the building, come now (5)"}}
+  - {at_s: 28, twin: POST /emergency_calls, body: {call_type: fire, lonlat: [10.1722, 36.8028], severity: high, genuine: false, description: "Fire! Fire in the building, come now (6)"}}
+  - {at_s: 33, twin: POST /emergency_calls, body: {call_type: fire, lonlat: [10.1722, 36.8028], severity: high, genuine: false, description: "Fire! Fire in the building, come now (7)"}}
+  - {at_s: 38, twin: POST /emergency_calls, body: {call_type: fire, lonlat: [10.1722, 36.8028], severity: high, genuine: false, description: "Fire! Fire in the building, come now (8)"}}
+  - {at_s: 43, twin: POST /emergency_calls, body: {call_type: fire, lonlat: [10.1722, 36.8028], severity: high, genuine: false, description: "Fire! Fire in the building, come now (9)"}}
+  - {at_s: 48, twin: POST /emergency_calls, body: {call_type: fire, lonlat: [10.1722, 36.8028], severity: high, genuine: false, description: "Fire! Fire in the building, come now (10)"}}
+expect:
+  - {max_commands: {target_type: fire_truck, action: dispatch, count: 1}}
+  - {max_commands: {target_type: [ambulance, police], action: dispatch, count: 1}}
+  - {no_command: {target_type: [valve, power_grid]}}
+  - {no_verdict: rejected}

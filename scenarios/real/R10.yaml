@@ -1,0 +1,15 @@
+id: R10
+testbook: B13
+name: Twin goes offline and comes back
+description: >
+  The real Twin is stopped at 3 s and started again at 25 s. The Brain marks it offline (status, Last Will),
+  sends no command while nobody can execute it (S7), and marks it online again when it is back.
+duration_s: 45
+steps:
+  - {at_s: 3, stop: twin}
+  - {at_s: 25, start: twin}
+expect:
+  - {event: layer_offline, text: twin, within_s: 12}
+  - {layer: twin, match: {status: offline}, within_s: 12}
+  - {no_command: any, after_s: 4, within_s: 25}
+  - {event: layer_online, text: twin, after_s: 25, within_s: 45}

@@ -1,0 +1,17 @@
+id: R3
+testbook: T5
+name: Fake flood (spoofed water sensor)
+description: >
+  The Twin spoofs water-07 at 4.2 m (a jump from about 0.4 m) while nothing else changes. Guardian rejects it,
+  quarantines it after three rejects, and the Brain neither opens a flood incident nor touches the valve.
+duration_s: 45
+observe: {readings: [water-07]}
+steps:
+  - {at_s: 5, twin: POST /faults, body: {sensor_id: WATER_07, kind: spoof, value: 4.2, duration_s: 35}}
+expect:
+  - {reading: water-07, match: {value: {gt: 4}}, within_s: 15}
+  - {verdict: rejected, match: {sensor_id: water-07}, after_s: 4, within_s: 20}
+  - {quarantine: quarantined, match: {device_id: water-07}, within_s: 25}
+  - {event: device_quarantined, text: water-07, within_s: 30}
+  - {no_command: {target_type: valve}}
+  - {no_event: incident_opened, match: {zone_id: zone-a, type: flood}}

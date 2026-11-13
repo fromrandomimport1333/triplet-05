@@ -1,0 +1,14 @@
+id: R17
+testbook: Twin T12
+name: Impossible value rejected
+description: >
+  air-02 reports 5000 ug/m3, outside its declared range (0-1000 in twin/meta). The Brain refuses the reading
+  (E_RANGE) and the Guardian rejects it; nobody acts on it.
+duration_s: 40
+steps:
+  - {at_s: 5, twin: POST /faults, body: {sensor_id: AIR_02, kind: spoof, value: 5000, duration_s: 30}}
+expect:
+  - {error_code: E_RANGE, after_s: 5, within_s: 20}
+  - {verdict: rejected, match: {sensor_id: air-02}, after_s: 5, within_s: 20}
+  - {no_event: incident_opened, match: {zone_id: zone-b, type: fire}}
+  - {no_command: any}

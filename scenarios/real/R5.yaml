@@ -1,0 +1,14 @@
+id: R5
+testbook: B11
+name: Power overload in zone B (one source only)
+description: >
+  Power demand x1.8 in zone B: power-01 reads about 990 kW. The Brain opens a power incident and proposes to shed
+  grid-b, but zone B has a single power sensor and no other evidence, so safety rule S3 (risky action needs two
+  different sources) refuses the command.
+duration_s: 45
+steps:
+  - {at_s: 3, twin: POST /scenario/conditions, body: {zone_id: zone_b, power_demand: 1.8}}
+expect:
+  - {event: incident_opened, match: {zone_id: zone-b, type: power_problem}, within_s: 30}
+  - {outcome: refused, match: {target_id: grid-b}, text: S3, within_s: 40}
+  - {no_command: {target_id: grid-b, action: shed}}

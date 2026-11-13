@@ -1,0 +1,50 @@
+# Settings of the real-layers runner (scenarios/run_real.py): the real Twin, the real Guardian and the Brain on
+# the triplet broker (TLS 8883). Paths are relative to the repository root. Environment variables override:
+# TWIN_URL, TWIN_TEST_KEY.
+
+twin_url: http://127.0.0.1:8000
+test_key: null              # null = api.test_key of twin/city.yaml
+
+settle_s: 12                # after the reset that starts every scenario: water back down, verdicts settled
+online_timeout_s: 45        # how long to wait for a restarted layer to say <layer>/status online
+
+# How the runner stops and restarts a layer for the "layer down" scenarios (R9, R10). stop = the process that
+# listens on `port`; start = the command below, run from `cwd`, output appended to logs/services/<name>.log.
+# {repo} = the repository root, {python} = the interpreter running the runner, {secrets} = brain/secrets.
+processes:
+  guardian:
+    port: 8443
+    cwd: guardian
+    start: ["{python}", "-m", "src.main"]
+    env:
+      GUARDIAN_ENV_FILE: /nonexistent
+      BRAIN_PROTOCOL_ENABLED: "true"
+      MQTT_HOST: 127.0.0.1
+      MQTT_PORT: "8883"
+      MQTT_TLS: "true"
+      MQTT_USERNAME: guardian
+      MQTT_PASSWORD_FILE: "{secrets}/guardian-password.txt"
+      MQTT_CA_FILE: "{secrets}/ca.crt"
+      TWIN_GUARDIAN_KEY_FILE: "{secrets}/keys/twin-guardian.key"
+      GUARDIAN_BRAIN_KEY_FILE: "{secrets}/keys/guardian-brain.key"
+      SENSOR_LIMITS_FILE: config/sensor_limits.brain.json
+      ANOMALY_MIN_SCORE: "0.4"
+      FROZEN_COUNT: "8"
+      VERDICT_REFRESH_S: "20"
+      REQUIRE_MTLS: "false"
+      VERDICT_SIGNING_KEY_FILE: "{repo}/guardian/.keys/verdict_ed25519.pem"
+  twin:
+    port: 8000
+    cwd: .
+    start: ["{python}", "twin/src/twin.py", "--fake"]
+    env:
+      INTEGRATION_ENABLED: "1"
+      PARTNER_MQTT_HOST: 127.0.0.1
+      PARTNER_MQTT_PORT: "8883"
+      PARTNER_MQTT_TLS: "1"
+      PARTNER_MQTT_CA_CERT: "{secrets}/ca.crt"
+      PARTNER_MQTT_USERNAME: twin
+      PARTNER_MQTT_PASSWORD_FILE: "{secrets}/twin-password.txt"
+      TWIN_BRAIN_KEY_FILE: "{secrets}/keys/twin-brain.key"
+      TWIN_GUARDIAN_KEY_FILE: "{secrets}/keys/twin-guardian.key"
+      PYTHONUNBUFFERED: "1"

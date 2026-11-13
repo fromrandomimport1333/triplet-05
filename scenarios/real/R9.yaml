@@ -1,0 +1,20 @@
+id: R9
+testbook: B4
+name: Guardian offline during a flood
+description: >
+  The real Guardian is stopped, then a flood starts in zone A. The Brain sees Guardian offline and goes to safe
+  mode: it still opens the flood incident and may give the traffic signal priority, but it does not open the valve
+  (S6: a risky action needs two different sensor TYPES while nobody checks the data; zone A has only water
+  sensors). The runner restarts the Guardian afterwards.
+duration_s: 70
+steps:
+  - {at_s: 2, stop: guardian}
+  - {at_s: 8, twin: POST /scenario/conditions, body: {zone_id: zone_a, rain_mm_h: 100}}
+  - {at_s: 30, twin: POST /emergency_calls, body: {call_type: flood, lonlat: [10.1930, 36.8037], severity: high, description: "The canal is overflowing into the street"}}
+expect:
+  - {event: layer_offline, text: guardian, within_s: 12}
+  - {layer: guardian, match: {status: offline}, within_s: 12}
+  - {incident: flood, match: {zone_id: zone-a}, within_s: 55}
+  - {decision: {mode: safe}, within_s: 65}
+  - {no_command: {target_type: valve}}
+  - {command: {target_type: traffic_signal}, within_s: 65, optional: true, note: priority on tl-01 is allowed in safe mode}

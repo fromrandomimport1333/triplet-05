@@ -1,0 +1,22 @@
+id: R13
+testbook: Twin T7
+name: Stuck drainage valve during a real flood
+description: >
+  valve-03 is stuck (fault actuator_stuck: the Twin answers failed) when a real flood starts. The Brain's open
+  command is acknowledged as failed, the outcome is failed, and the water keeps rising. The Guardian still trusts
+  the water sensors: a real flood is not an attack. (The Twin team's version also closes ROAD_01; the Twin does
+  not declare road closures to the Brain, so that part cannot happen on the real layers.)
+duration_s: 75
+observe: {readings: [water-07]}
+steps:
+  - {at_s: 0, twin: POST /faults, body: {sensor_id: VALVE_03, kind: actuator_stuck, duration_s: 80}}
+  - {at_s: 2, twin: POST /scenario/conditions, body: {zone_id: zone_a, rain_mm_h: 100}}
+  - {at_s: 25, twin: POST /emergency_calls, body: {call_type: flood, lonlat: [10.1930, 36.8037], severity: high, description: "The canal is overflowing, water in the street"}}
+expect:
+  - {event: incident_opened, match: {zone_id: zone-a, type: flood}, within_s: 30}
+  - {command: {target_id: valve-03, action: open}, within_s: 35}
+  - {ack: failed, match: {actuator_id: valve-03}, within_s: 40}
+  - {outcome: failed, match: {target_id: valve-03}, within_s: 45}
+  - {reading: water-07, match: {value: {gt: 1.3}}, after_s: 30, within_s: 75}
+  - {no_verdict: rejected, match: {sensor_id: [water-07, water-08]}}
+  - {command: {target_type: [ambulance, fire_truck, traffic_signal]}, within_s: 75, optional: true, note: a fallback response once the valve has failed}

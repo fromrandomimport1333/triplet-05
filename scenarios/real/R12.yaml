@@ -1,0 +1,20 @@
+id: R12
+testbook: Twin T6
+name: Real jam + spoofed flood, then the Guardian is killed
+description: >
+  A real jam builds in zone A (jam 1.0) while water-08 is spoofed to 4.2 m. Guardian rejects and quarantines
+  water-08 and the Brain handles the jam but never the fake flood. At 50 s the Guardian is killed and water-07 is
+  spoofed too: the Brain is in safe mode and still opens no valve. The runner restarts the Guardian afterwards.
+duration_s: 85
+steps:
+  - {at_s: 2, twin: POST /scenario/conditions, body: {zone_id: zone_a, jam: 1.0}}
+  - {at_s: 10, twin: POST /faults, body: {sensor_id: WATER_08, kind: spoof, value: 4.2, duration_s: 70}}
+  - {at_s: 50, stop: guardian}
+  - {at_s: 55, twin: POST /faults, body: {sensor_id: WATER_07, kind: spoof, value: 4.2, duration_s: 25}}
+expect:
+  - {verdict: rejected, match: {sensor_id: water-08}, after_s: 10, within_s: 25}
+  - {quarantine: quarantined, match: {device_id: water-08}, within_s: 30}
+  - {incident: traffic_jam, match: {zone_id: zone-a}, within_s: 50}
+  - {event: layer_offline, text: guardian, after_s: 50, within_s: 62}
+  - {no_command: {target_type: valve}}
+  - {no_event: incident_opened, match: {zone_id: zone-a, type: flood}, within_s: 50}
