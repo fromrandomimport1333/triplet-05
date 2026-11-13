@@ -257,3 +257,6 @@ twin/sumo/**/output/
 secrets/
 *.key
 ca.crt
+
+# the timeline UI source folder is named lib/ too: keep it (the Python lib/ rule above hid it)
+!brain/ui/src/lib/

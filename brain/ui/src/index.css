@@ -57,6 +57,7 @@
 .m-act.spin .glyph { animation: spin 2.4s linear infinite; transform-box: fill-box; transform-origin: center; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .m-tag { font: 700 12.5px "Inter Variable", sans-serif; letter-spacing: .05em; }
+.m-more { font: 650 11px "Inter Variable", sans-serif; font-variant-numeric: tabular-nums; }
 .m-unit { transition: transform 2.8s cubic-bezier(.5, 0, .3, 1); }
 .m-unit.nomove { transition: none; }
 .m-unit text { font: 800 13px "Inter Variable", sans-serif; pointer-events: none; }

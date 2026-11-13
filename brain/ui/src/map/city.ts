@@ -11,7 +11,13 @@ const SHORT = {water_level: "water", air_quality: "air", traffic_speed: "speed",
 // --- city map ----------------------------------------------------------------------------
 // Drawn once per city description (zones, roads, devices), then updated in place every state
 // push, so the animations (water, smoke, traffic, units driving) never restart.
-const CW = 360, CH = 172, GAP = 62, MG = 18, SEA = 78, LEG = 6;
+const CW = 360, CH = 172, GAP = 62, MG = 18, SEA = 78, LEG = 6, HUB = 104;
+// Sensor dots: a right-aligned block of at most 2 rows, so a zone with many sensors (the real Twin has 18
+// cameras in one zone) never runs over the zone's name or status. Beyond the block: a "+N" counter.
+const DOT_COLS = 12, DOT_ROWS = 2, DOT_PITCH = 11, DOT_PITCH_LOOSE = 14;
+// Types that matter most to an incident come first (rightmost), traffic cameras last.
+const DOT_ORDER = ["water_level", "power_load", "air_quality", "smoke", "co", "co2", "temperature"];
+const dotRank = (t) => { const i = DOT_ORDER.indexOf(t); return i < 0 ? DOT_ORDER.length : i; };
 const TINT = {port: "#12202e", commercial: "#151d27", medical: "#14261f", industrial: "#251f14", residential: "#141c24"};
 const UNIT_LOOK = {ambulance: ["#f8fafc", "#c4443d", "A"], fire_truck: ["#e0645c", "#fff", "F"],
   police: ["#6b95e0", "#fff", "P"], rescue: ["#d9803a", "#1a0d00", "R"]};
@@ -47,14 +53,15 @@ function buildMap(st) {
   const m = st.map || {}, zones = st.zones || [];
   const {pos, ncols, nrows, free} = mapLayout(zones, m.layout || {});
   const sea = m.sea;
-  const x0 = MG + (sea === "west" ? SEA : 0), y0 = MG + (sea === "north" ? SEA : 0);
+  const band = free.length ? 0 : HUB;      // no free cell for the Brain: give it its own band above the zones
+  const x0 = MG + (sea === "west" ? SEA : 0), y0 = MG + (sea === "north" ? SEA : 0) + band;
   const gw = ncols * CW + (ncols - 1) * GAP, gh = nrows * CH + (nrows - 1) * GAP;
   const vw = x0 + gw + MG + (sea === "east" ? SEA : 0), vh = y0 + gh + MG + (sea === "south" ? SEA : 0) + LEG;
   const box = {};
   for (const z of zones) { const [c, r] = pos[z.zone_id]; box[z.zone_id] = {x: x0 + c * (CW + GAP), y: y0 + r * (CH + GAP)}; }
   const centre = (id) => [box[id].x + CW / 2, box[id].y + CH / 2];
   // the Brain sits in the free cell nearest the middle (or above the grid when the grid is full)
-  let hub = [x0 + gw / 2, Math.max(16, y0 - 12)];
+  let hub = [x0 + gw / 2, y0 - band / 2 - 4];
   if (free.length) {
     const mc = (ncols - 1) / 2, mr = (nrows - 1) / 2;
     free.sort((a, b) => Math.hypot(a[0] - mc, a[1] - mr) - Math.hypot(b[0] - mc, b[1] - mr));
@@ -67,7 +74,8 @@ function buildMap(st) {
   if (sea) {
     const r = {west: [0, 0, SEA + MG / 2, vh - LEG], east: [vw - SEA - MG / 2, 0, SEA + MG / 2, vh - LEG],
       north: [0, 0, vw, SEA + MG / 2], south: [0, vh - LEG - SEA - MG / 2, vw, SEA + MG / 2]}[sea];
-    if (r) s += `<g><rect x="${r[0]}" y="${r[1]}" width="${r[2]}" height="${r[3]}" fill="#13293b"/>` +
+    if (r) s += `<clipPath id="m-seaclip"><rect x="${r[0]}" y="${r[1]}" width="${r[2]}" height="${r[3]}"/></clipPath>` +
+      `<g clip-path="url(#m-seaclip)"><rect x="${r[0]}" y="${r[1]}" width="${r[2]}" height="${r[3]}" fill="#13293b"/>` +
       `<rect class="m-sea" x="${r[0]}" y="${r[1]}" width="${r[2] + 80}" height="${r[3]}" fill="url(#mwv)" opacity=".5"/>` +
       `<text x="${r[0] + r[2] / 2}" y="${r[1] + r[3] / 2}" text-anchor="middle" class="m-legend" fill="#8cc4e3" transform="rotate(${sea === "west" || sea === "east" ? -90 : 0} ${r[0] + r[2] / 2} ${r[1] + r[3] / 2})" style="letter-spacing:.5em">SEA</text></g>`;
   }
@@ -85,7 +93,7 @@ function buildMap(st) {
   s += "</g>";
   // zones
   const acts = m.actuators || {}, sensors = m.sensors || {};
-  const apos = {};
+  const apos = {}, dotInfo = {};
   for (const z of zones) {
     const {x, y} = box[z.zone_id], id = z.zone_id;
     s += `<g><rect x="${x}" y="${y}" width="${CW}" height="${CH}" rx="8" fill="${TINT[z.type] || "#141c24"}"/>`;
@@ -101,14 +109,29 @@ function buildMap(st) {
       `<text id="mv-${id}" x="${x + 12}" y="${y + 70}" class="zone-val"></text>` +
       `<line id="ma-${id}" x1="${x + 12}" x2="${x + 202}" stroke="#e0645c" stroke-dasharray="4 3" opacity="0"/>` +
       `<polyline id="mp-${id}" fill="none" stroke="#67b7c4" stroke-width="2" points=""/>`;
-    s += `<g id="mcall-${id}" opacity="0" transform="translate(${x + CW - 22} ${y + 70})"><g class="m-call"><circle r="13" fill="#d6a24a"/>` +
+    s += `<g id="mcall-${id}" opacity="0" transform="translate(${x + CW - 22} ${y + 76})"><g class="m-call"><circle r="13" fill="#d6a24a"/>` +
       `<path d="M-6,-4 q0,-3 3,-3 l2,4 l-2,2 q2,4 6,6 l2,-2 l4,2 q0,3 -3,3 q-12,-2 -12,-12z" fill="#1a1200"/></g>` +
       `<circle cx="11" cy="-10" r="9" fill="#c4443d"/><text id="mcalln-${id}" x="11" y="-6" text-anchor="middle" class="m-tag" fill="#fff" style="font-size:11px"></text><title id="mcallt-${id}">calls</title></g>`;
     // sensors: one dot each, coloured by Guardian's verdict
-    const sl = Object.entries(sensors).filter(([, v]) => v.zone_id === id).sort((a, b) => a[0] < b[0] ? -1 : 1);
-    sl.forEach(([sid, v], k) => {
-      s += `<circle id="mn-${sid}" cx="${x + CW - 14 - k * 15}" cy="${y + 42}" r="5" fill="#475569"><title>${esc(sid)} (${esc(v.type)})</title></circle>`;
+    const sl = Object.entries(sensors).filter(([, v]) => v.zone_id === id)
+      .sort((a, b) => dotRank(a[1].type) - dotRank(b[1].type) || (a[1].type < b[1].type ? -1 : a[1].type > b[1].type ? 1 : 0) || (a[0] < b[0] ? -1 : 1));
+    const cap = DOT_COLS * DOT_ROWS, over = sl.length > cap;
+    const shown = over ? sl.slice(0, cap - 1) : sl, hidden = over ? sl.slice(cap - 1) : [];
+    const rows = shown.length + (over ? 1 : 0) > DOT_COLS ? 2 : 1;
+    const cols = Math.ceil((shown.length + (over ? 1 : 0)) / rows);
+    const pitch = rows === 1 && cols <= 8 ? DOT_PITCH_LOOSE : DOT_PITCH;
+    const rowY = rows === 1 ? [y + 42] : [y + 37, y + 48];
+    shown.forEach(([sid, v], k) => {
+      const c = k % cols, r = Math.floor(k / cols);
+      s += `<circle id="mn-${sid}" cx="${x + CW - 14 - c * pitch}" cy="${rowY[r]}" r="4" fill="#475569"><title>${esc(sid)} (${esc(v.type)})</title></circle>`;
     });
+    if (over) {
+      const k = shown.length, c = k % cols, r = Math.floor(k / cols);
+      s += `<text id="mnx-${id}" x="${x + CW - 14 - c * pitch + 5}" y="${rowY[r] + 4}" text-anchor="end" class="m-more" fill="#94a3b8">+${hidden.length}` +
+        `<title>${hidden.length} more sensors: ${esc(hidden.map(h => h[0]).join(", "))}</title></text>`;
+    }
+    const dotsLeft = x + CW - 14 - (cols - 1 + (over ? 1 : 0)) * pitch - 10;
+    dotInfo[id] = {badgeW: dotsLeft - (x + 12) - 10, hidden: hidden.map(h => h[0])};
     // actuators along the bottom edge
     const al = Object.entries(acts).filter(([, v]) => v.zone_id === id).sort((a, b) => a[0] < b[0] ? -1 : 1);
     al.forEach(([aid, v], k) => {
@@ -135,7 +158,7 @@ function buildMap(st) {
   s += `</g>`;
   s += `</svg>`;
   MAPEL.innerHTML = s;
-  GEO = {box, hub, apos, pairs};
+  GEO = {box, hub, apos, pairs, dotInfo};
 }
 
 // the zone's sensor of a type, or null when it is not believed (rejected by Guardian or quarantined):
@@ -168,9 +191,11 @@ function updateMap(st) {
     o.setAttribute("stroke", col); o.setAttribute("stroke-width", inc ? 4 : q ? 2.5 : 1.5);
     o.setAttribute("stroke-dasharray", q && !inc ? "9 6" : ""); o.classList.toggle("pulse", inc);
     const b = $("mb-" + id);
-    if (inc && z.incident) { b.textContent = z.incident.type.toUpperCase().replace("_", " ") + " · " + sev; b.setAttribute("fill", col); }
-    else if (q) { b.textContent = "QUARANTINE " + z.quarantined.slice(0, 2).join(", "); b.setAttribute("fill", "#d6a24a"); }
-    else { b.textContent = "NORMAL"; b.setAttribute("fill", "#5fbf8a"); }
+    let label;
+    if (inc && z.incident) { label = z.incident.type.toUpperCase().replace(/_/g, " ") + " · " + sev; b.setAttribute("fill", col); }
+    else if (q) { label = "QUARANTINE " + z.quarantined.slice(0, 2).join(", "); b.setAttribute("fill", "#d6a24a"); }
+    else { label = "NORMAL"; b.setAttribute("fill", "#5fbf8a"); }
+    fitText(b, label, (GEO.dotInfo[id] || {}).badgeW || CW - 24);
     $("mw-" + id).style.transform = `scaleY(${(level(st, z, "water_level") * .8).toFixed(3)})`;
     $("ms-" + id).setAttribute("opacity", (level(st, z, "air_quality") * .85).toFixed(2));
     const sp = z.spark, bx = GEO.box[id];
@@ -201,9 +226,16 @@ function updateMap(st) {
     const el = $("mn-" + sid); if (!el) continue;
     const quar = (st.quarantined || {})[sid] !== undefined;
     el.setAttribute("fill", quar ? "#e0645c" : !gOn ? "#475569" : {trusted: "#5fbf8a", suspicious: "#d6a24a", rejected: "#e0645c"}[v.verdict] || "#475569");
-    el.setAttribute("r", quar || v.verdict === "rejected" ? 7 : 5);
+    el.setAttribute("r", quar || v.verdict === "rejected" ? 5.5 : 4);
     el.setAttribute("stroke", quar ? "#fff" : "none");
     el.querySelector("title").textContent = `${sid} (${v.type}): ${quar ? "QUARANTINED" : !gOn ? "not checked (Guardian offline)" : v.verdict || "no verdict yet"}`;
+  }
+  // "+N" counter: red when one of the sensors it hides is rejected or quarantined, so a problem is never invisible
+  for (const [zid, info] of Object.entries(GEO.dotInfo || {})) {
+    const t = $("mnx-" + zid); if (!t) continue;
+    const bad = info.hidden.filter(sid => (st.quarantined || {})[sid] !== undefined || (gOn && ((m.sensors || {})[sid] || {}).verdict === "rejected"));
+    const warn = gOn && info.hidden.some(sid => ((m.sensors || {})[sid] || {}).verdict === "suspicious");
+    t.setAttribute("fill", bad.length ? "#e0645c" : warn ? "#d6a24a" : "#94a3b8");
   }
   // actuators: state, quarantine, the last outcome (refused by a safety rule, failed)
   for (const [aid, a] of Object.entries(acts)) {
@@ -259,6 +291,16 @@ function updateMap(st) {
   $("m-beams").innerHTML = beams;
   $("m-frame").setAttribute("stroke", st.safe_mode ? "#d6a24a" : "#1f2933");
   $("m-frame").setAttribute("stroke-width", st.safe_mode ? 2 : 1);
+}
+// sets an SVG text, trimmed with an ellipsis so it never runs into the sensor dots
+function fitText(el, text, maxW) {
+  if (el.dataset.full === text && el.dataset.w === String(maxW)) return;
+  el.dataset.full = text; el.dataset.w = String(maxW);
+  el.textContent = text;
+  let cut = text.length;
+  while (cut > 1 && el.getComputedTextLength() > maxW) el.textContent = text.slice(0, --cut).trimEnd() + "…";
+  let t = el.querySelector("title");
+  if (el.textContent !== text) { if (!t) { t = document.createElementNS("http://www.w3.org/2000/svg", "title"); el.appendChild(t); } t.textContent = text; }
 }
 function level2(st, z) {                // traffic: density over its alert threshold (1 = at the threshold)
   if (!z) return 0;
